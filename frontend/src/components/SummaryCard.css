@@ -1,0 +1,106 @@
+.summary-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 250px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle background accent shape for normal cards */
+.summary-card:not(.alert)::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 100px;
+  height: 100px;
+  background-color: var(--accent-secondary);
+  border-radius: 50%;
+  opacity: 0.5;
+  z-index: 0;
+}
+
+.summary-card.alert {
+  background-color: var(--alert-red-bg);
+  border-color: rgba(199, 59, 59, 0.1);
+}
+
+.summary-header, .summary-body {
+  position: relative;
+  z-index: 1;
+}
+
+.summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.summary-title {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.alert .summary-title {
+  color: var(--alert-red);
+}
+
+.summary-icon-wrapper {
+  background-color: var(--accent-primary);
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.summary-icon-wrapper.alert-icon {
+  background-color: transparent;
+  color: var(--alert-red);
+}
+
+.summary-value {
+  font-size: 2.5rem;
+  font-family: 'Playfair Display', serif; /* Or similar elegant font */
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  line-height: 1.1;
+}
+
+.alert-text {
+  color: var(--alert-red);
+}
+
+.summary-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+}
+
+.trend {
+  font-weight: 500;
+}
+
+.trend-up {
+  color: var(--accent-primary);
+}
+
+.trend-down {
+  color: var(--alert-red);
+}
+
+.subtitle {
+  color: var(--text-secondary);
+}
+
+.alert-subtitle {
+  color: var(--alert-red);
+  font-weight: 500;
+}
