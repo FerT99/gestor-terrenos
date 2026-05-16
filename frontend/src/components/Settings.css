@@ -1,0 +1,358 @@
+.settings-container {
+  padding: 2.5rem;
+  flex-grow: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-primary);
+}
+
+.settings-header {
+  margin-bottom: 2rem;
+}
+
+.settings-title {
+  font-size: 2rem;
+  font-family: 'Playfair Display', serif;
+  margin-bottom: 0.5rem;
+  font-weight: 400;
+  color: var(--text-primary);
+}
+
+.settings-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.settings-content {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.settings-left-column {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.settings-right-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 320px;
+}
+
+.settings-card {
+  padding: 1.5rem;
+  background-color: var(--accent-secondary); /* Based on the image, the settings cards have that warm beige background */
+  border-color: rgba(0,0,0,0.03);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.card-icon {
+  color: var(--accent-primary);
+}
+
+.card-title {
+  font-size: 1.125rem;
+  font-family: 'Playfair Display', serif;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.card-desc {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+/* Forms */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.form-input, .form-select {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: white;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.form-input:focus, .form-select:focus {
+  border-color: var(--accent-primary);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.mt-4 { margin-top: 1rem; }
+.mt-6 { margin-top: 1.5rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+
+/* Business Rules */
+.rules-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.rule-box {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+}
+
+.rule-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.rule-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.rule-symbol {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.rule-desc {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  min-height: 40px;
+}
+
+.rule-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rule-input {
+  width: 80px;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  text-align: center;
+  font-size: 1rem;
+  color: var(--text-primary);
+  outline: none;
+}
+
+.rule-suffix {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.text-alert {
+  color: var(--alert-red);
+}
+
+/* Toggle switch */
+.toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.toggle-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.toggle-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.toggle-desc {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--border-color);
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: var(--accent-primary);
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+.slider.round {
+  border-radius: 24px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/* Exchange Rate */
+.exchange-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.exchange-box {
+  background-color: white;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.exchange-currency {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.exchange-arrow {
+  color: var(--text-muted);
+}
+
+.exchange-input {
+  width: 80px;
+  padding: 0.5rem;
+  border: 1px solid var(--accent-tertiary);
+  border-radius: 4px;
+  text-align: center;
+  font-size: 1rem;
+  color: var(--accent-primary);
+  outline: none;
+}
+
+.update-time {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Preferences */
+.notifications-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.notifications-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.notifications-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.badge-coming-soon {
+  background-color: var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.6rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.checkbox-label.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.checkbox-text {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.checkbox-label input[type="checkbox"] {
+  accent-color: var(--accent-primary);
+}

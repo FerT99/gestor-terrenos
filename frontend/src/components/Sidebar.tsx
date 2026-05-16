@@ -12,10 +12,9 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView }) => {
     <aside className="sidebar">
       <div className="sidebar-header">
         <div className="profile">
-          <img src="https://i.pravatar.cc/150?img=11" alt="Profile" className="profile-img" />
           <div className="profile-info">
             <h2 className="company-name">Sahara Lands</h2>
-            <span className="role">SALES ADMINISTRATION</span>
+            <span className="role">ADMINISTRACIÓN DE VENTAS</span>
           </div>
         </div>
       </div>
@@ -25,31 +24,31 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView }) => {
           <li className={currentView === 'dashboard' ? 'active' : ''}>
             <a href="#" onClick={(e) => { e.preventDefault(); setCurrentView('dashboard'); }} className="flex items-center gap-3">
               <LayoutDashboard size={20} />
-              <span>Dashboard</span>
+              <span>Panel Inicial</span>
             </a>
           </li>
           <li className={currentView === 'catalog' ? 'active' : ''}>
             <a href="#" onClick={(e) => { e.preventDefault(); setCurrentView('catalog'); }} className="flex items-center gap-3">
               <Map size={20} />
-              <span>Land Catalog</span>
+              <span>Catálogo de Terrenos</span>
             </a>
           </li>
-          <li>
-            <a href="#" className="flex items-center gap-3">
+          <li className={currentView === 'clients' ? 'active' : ''}>
+            <a href="#" onClick={(e) => { e.preventDefault(); setCurrentView('clients'); }} className="flex items-center gap-3">
               <Users size={20} />
-              <span>Clients</span>
+              <span>Clientes</span>
             </a>
           </li>
-          <li>
-            <a href="#" className="flex items-center gap-3">
+          <li className={currentView === 'payments' ? 'active' : ''}>
+            <a href="#" onClick={(e) => { e.preventDefault(); setCurrentView('payments'); }} className="flex items-center gap-3">
               <CreditCard size={20} />
-              <span>Payments</span>
+              <span>Pagos</span>
             </a>
           </li>
-          <li>
-            <a href="#" className="flex items-center gap-3">
+          <li className={currentView === 'settings' ? 'active' : ''}>
+            <a href="#" onClick={(e) => { e.preventDefault(); setCurrentView('settings'); }} className="flex items-center gap-3">
               <Settings size={20} />
-              <span>Settings</span>
+              <span>Configuración</span>
             </a>
           </li>
         </ul>
@@ -58,23 +57,32 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView }) => {
       <div className="sidebar-footer">
         <div className="sidebar-actions">
           <button className="btn-primary w-full flex items-center justify-center gap-2">
-            <span>+</span> New Sale
+            <span>+</span> Nueva Venta
           </button>
         </div>
         <ul>
           <li>
             <a href="#" className="flex items-center gap-3">
               <HelpCircle size={20} />
-              <span>Support</span>
+              <span>Soporte</span>
             </a>
           </li>
           <li>
             <a href="#" className="flex items-center gap-3">
               <LogOut size={20} />
-              <span>Sign Out</span>
+              <span>Cerrar Sesión</span>
             </a>
           </li>
         </ul>
+        
+        {/* Bottom User Profile */}
+        <div className="bottom-profile">
+          <img src="https://i.pravatar.cc/150?img=11" alt="J. Smith" className="bottom-profile-img" />
+          <div className="bottom-profile-info">
+            <span className="bottom-profile-name">J. Smith</span>
+            <span className="bottom-profile-role">Admin</span>
+          </div>
+        </div>
       </div>
     </aside>
   );

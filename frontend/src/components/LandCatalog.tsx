@@ -28,8 +28,8 @@ const LandCatalog = () => {
     <main className="catalog-container">
       <div className="catalog-header">
         <div>
-          <h2 className="catalog-title">Land Catalog</h2>
-          <p className="catalog-subtitle">Manage properties, track availability, and oversee lot assignments across the Sahara Lands portfolio.</p>
+          <h2 className="catalog-title">Catálogo de Terrenos</h2>
+          <p className="catalog-subtitle">Administra propiedades, disponibilidad y asignación de lotes en todo el portafolio de Loterra.</p>
         </div>
         <button className="btn-primary flex items-center gap-2">
           <span>+</span> Nuevo Lote
@@ -40,8 +40,8 @@ const LandCatalog = () => {
         <span className="filter-label">Estado:</span>
         <div className="filter-pills">
           {filters.map(f => (
-            <button 
-              key={f} 
+            <button
+              key={f}
               className={`pill ${filter === f ? 'active' : ''}`}
               onClick={() => setFilter(f)}
             >
@@ -92,9 +92,9 @@ const LandCatalog = () => {
             ))}
           </tbody>
         </table>
-        
+
         <div className="table-footer">
-          <span className="showing-text">Showing 1 to 5 of 124 entries</span>
+          <span className="showing-text">Mostrando 1 a 5 de 124 registros</span>
           <div className="pagination">
             <button className="page-btn"><ChevronLeft size={16} /></button>
             <button className="page-btn"><ChevronRight size={16} /></button>

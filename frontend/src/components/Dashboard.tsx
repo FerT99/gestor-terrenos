@@ -9,15 +9,15 @@ const Dashboard = () => {
   return (
     <main className="dashboard">
       <div className="dashboard-header">
-        <h2 className="dashboard-title">Overview</h2>
-        <p className="dashboard-subtitle">Performance metrics and alerts for the current period.</p>
+        <h2 className="dashboard-title">Panel Inicial</h2>
+        <p className="dashboard-subtitle">Métricas de rendimiento y alertas del periodo actual.</p>
       </div>
 
       <div className="summary-cards">
         <SummaryCard 
           title="Lotes Vendidos" 
           value="42" 
-          subtitle="vs last month" 
+          subtitle="vs mes anterior" 
           icon={<CheckCircle2 size={16} />} 
           trend="12%" 
           trendUp={true} 
@@ -33,7 +33,7 @@ const Dashboard = () => {
         <SummaryCard 
           title="Adeudos Vencidos" 
           value="14" 
-          subtitle="! Action required" 
+          subtitle="! Acción requerida" 
           icon={<AlertTriangle size={16} />} 
           isAlert={true} 
         />

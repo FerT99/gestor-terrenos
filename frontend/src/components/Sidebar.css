@@ -36,6 +36,7 @@
 .role {
   font-size: 0.75rem;
   color: var(--text-secondary);
+  letter-spacing: 0.05em;
 }
 
 .sidebar-actions {
@@ -82,4 +83,36 @@
   margin-top: auto;
   padding-top: 1rem;
   border-top: 1px solid var(--border-color);
+}
+
+.bottom-profile {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.bottom-profile-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.bottom-profile-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.bottom-profile-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.bottom-profile-role {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
 }
