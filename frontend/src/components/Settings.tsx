@@ -18,23 +18,23 @@ const Settings = () => {
               <Building2 size={20} className="card-icon" />
               <h3 className="card-title">Perfil de Empresa</h3>
             </div>
-            
+
             <div className="form-grid">
               <div className="form-group">
                 <label>Razón Social</label>
-                <input type="text" defaultValue="Sahara Lands LLC" className="form-input" />
+                <input type="text" defaultValue="Loterra" className="form-input" />
               </div>
               <div className="form-group">
                 <label>Tax ID / RFC</label>
-                <input type="text" defaultValue="SAHL-2023-XYZ" className="form-input" />
+                <input type="text" defaultValue="LOTT-2023-XYZ" className="form-input" />
               </div>
             </div>
-            
+
             <div className="form-group mt-4">
               <label>Dirección Fiscal</label>
               <input type="text" defaultValue="124 Golden Dune Blvd, Suite 400" className="form-input" />
             </div>
-            
+
             <div className="form-grid mt-4">
               <div className="form-group">
                 <label>Email de Soporte</label>
@@ -45,7 +45,7 @@ const Settings = () => {
                 <input type="text" defaultValue="+1 (555) 019-2834" className="form-input" />
               </div>
             </div>
-            
+
             <div className="form-actions mt-6">
               <button className="btn-primary">Guardar Perfil</button>
             </div>
@@ -57,7 +57,7 @@ const Settings = () => {
               <Gavel size={20} className="card-icon" />
               <h3 className="card-title">Reglas de Negocio</h3>
             </div>
-            
+
             <div className="rules-grid">
               <div className="rule-box">
                 <div className="rule-header">
@@ -70,7 +70,7 @@ const Settings = () => {
                   <span className="rule-suffix">%</span>
                 </div>
               </div>
-              
+
               <div className="rule-box">
                 <div className="rule-header">
                   <span className="rule-title">Porcentaje de Mora</span>
@@ -83,7 +83,7 @@ const Settings = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="toggle-row mt-6">
               <div className="toggle-info">
                 <span className="toggle-title">Permitir Días de Gracia</span>
@@ -105,7 +105,7 @@ const Settings = () => {
               <h3 className="card-title">Tipo de Cambio</h3>
             </div>
             <p className="card-desc mb-4">Establecer el tipo de cambio manual usado para métricas.</p>
-            
+
             <div className="exchange-wrapper">
               <div className="exchange-box">
                 <span className="exchange-currency">1 USD</span>
@@ -123,7 +123,7 @@ const Settings = () => {
               <Sliders size={20} className="card-icon" />
               <h3 className="card-title">Preferencias</h3>
             </div>
-            
+
             <div className="form-group mb-6">
               <label>Idioma del Sistema</label>
               <select className="form-select">
@@ -131,18 +131,18 @@ const Settings = () => {
                 <option>Español (MX)</option>
               </select>
             </div>
-            
+
             <div className="notifications-section">
               <div className="notifications-header">
                 <span className="notifications-title">Notificaciones</span>
                 <span className="badge-coming-soon">PRÓXIMAMENTE</span>
               </div>
-              
+
               <label className="checkbox-label disabled">
                 <input type="checkbox" defaultChecked disabled />
                 <span className="checkbox-text">Resúmenes por email (Semanal)</span>
               </label>
-              
+
               <label className="checkbox-label disabled">
                 <input type="checkbox" disabled />
                 <span className="checkbox-text">Alertas de Slack para ventas nuevas</span>

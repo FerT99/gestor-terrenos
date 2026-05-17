@@ -5,20 +5,21 @@ import './Sidebar.css';
 interface SidebarProps {
   currentView: string;
   setCurrentView: (view: string) => void;
+  onLogout?: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView }) => {
+const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView, onLogout }) => {
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
         <div className="profile">
           <div className="profile-info">
-            <h2 className="company-name">Sahara Lands</h2>
+            <h2 className="company-name">Loterra</h2>
             <span className="role">ADMINISTRACIÓN DE VENTAS</span>
           </div>
         </div>
       </div>
-      
+
       <nav className="sidebar-nav">
         <ul>
           <li className={currentView === 'dashboard' ? 'active' : ''}>
@@ -68,13 +69,13 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView }) => {
             </a>
           </li>
           <li>
-            <a href="#" className="flex items-center gap-3">
+            <a href="#" onClick={(e) => { e.preventDefault(); if (onLogout) onLogout(); }} className="flex items-center gap-3">
               <LogOut size={20} />
               <span>Cerrar Sesión</span>
             </a>
           </li>
         </ul>
-        
+
         {/* Bottom User Profile */}
         <div className="bottom-profile">
           <img src="https://i.pravatar.cc/150?img=11" alt="J. Smith" className="bottom-profile-img" />

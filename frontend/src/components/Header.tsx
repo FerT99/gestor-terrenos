@@ -6,7 +6,7 @@ const Header = () => {
   return (
     <header className="header">
       <div className="header-left">
-        <h1 className="header-title">Sahara Admin</h1>
+        <h1 className="header-title">Loterra Admin</h1>
         <nav className="header-tabs">
           <button className="tab active">Overview</button>
           <button className="tab">Map View</button>
@@ -19,9 +19,9 @@ const Header = () => {
           <Search size={18} className="search-icon" />
           <input type="text" placeholder="Search..." />
         </div>
-        
+
         <button className="export-btn">Export Data</button>
-        
+
         <div className="header-actions">
           <button className="icon-btn">
             <Bell size={20} />
