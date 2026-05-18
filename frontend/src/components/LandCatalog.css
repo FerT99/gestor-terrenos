@@ -192,3 +192,120 @@
 .page-btn:hover {
   background-color: var(--bg-primary);
 }
+
+/* ─── New additions ─────────────────────────────────────────────────────── */
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+}
+
+.filter-count {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.page-indicator {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  padding: 0 0.25rem;
+}
+
+.small-text {
+  font-size: 0.75rem;
+}
+
+/* Loading / empty / error states */
+.catalog-loading,
+.catalog-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 4rem 2rem;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.catalog-error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(224, 123, 84, 0.1);
+  border: 1px solid rgba(224, 123, 84, 0.25);
+  border-radius: 8px;
+  color: #e07b54;
+  font-size: 0.82rem;
+  padding: 0.6rem 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Action buttons in table rows */
+.action-buttons {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.edit-btn {
+  color: var(--text-secondary);
+}
+
+.edit-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+}
+
+.delete-btn {
+  color: var(--text-muted);
+}
+
+.delete-btn:hover:not(:disabled) {
+  background: rgba(224, 80, 80, 0.12);
+  color: #e05050;
+  border-color: rgba(224, 80, 80, 0.3);
+}
+
+.delete-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Spin animation */
+.spin {
+  animation: catalogSpin 0.8s linear infinite;
+}
+
+@keyframes catalogSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
