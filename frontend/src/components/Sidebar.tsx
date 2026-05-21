@@ -1,6 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, Map, Users, CreditCard, Settings, HelpCircle, LogOut } from 'lucide-react';
-import './Sidebar.css';
+import { LayoutDashboard, Map, Users, CreditCard, Settings, HelpCircle, LogOut, Plus } from 'lucide-react';
 
 interface SidebarProps {
   currentView: string;
@@ -9,79 +8,78 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView, onLogout }) => {
+  const menuItems = [
+    { id: 'dashboard', icon: LayoutDashboard, label: 'Panel Inicial' },
+    { id: 'catalog', icon: Map, label: 'Catálogo de Terrenos' },
+    { id: 'clients', icon: Users, label: 'Clientes' },
+    { id: 'payments', icon: CreditCard, label: 'Pagos' },
+    { id: 'settings', icon: Settings, label: 'Configuración' },
+  ];
+
   return (
-    <aside className="sidebar">
-      <div className="sidebar-header">
-        <div className="profile">
-          <div className="profile-info">
-            <h2 className="company-name">Loterra</h2>
-            <span className="role">ADMINISTRACIÓN DE VENTAS</span>
+    <aside className="w-72 bg-white border-r border-neutral-200 h-full flex flex-col transition-all duration-300">
+      {/* Header */}
+      <div className="p-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-orange-500/20">
+            L
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-neutral-900 tracking-tight">Loterra</h2>
+            <span className="text-[10px] font-bold text-neutral-400 tracking-widest uppercase">Admin Ventas</span>
           </div>
         </div>
       </div>
 
-      <nav className="sidebar-nav">
-        <ul>
-          <li className={currentView === 'dashboard' ? 'active' : ''}>
-            <a href="#" onClick={(e) => { e.preventDefault(); setCurrentView('dashboard'); }} className="flex items-center gap-3">
-              <LayoutDashboard size={20} />
-              <span>Panel Inicial</span>
+      {/* Nav */}
+      <nav className="flex-1 px-4 overflow-y-auto">
+        <div className="space-y-1 mb-8">
+          <p className="px-4 text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2">Menú Principal</p>
+          {menuItems.map((item) => (
+            <a
+              key={item.id}
+              href="#"
+              onClick={(e) => { e.preventDefault(); setCurrentView(item.id); }}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group relative ${
+                currentView === item.id
+                  ? 'bg-orange-50 text-orange-700 font-medium'
+                  : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900 font-medium'
+              }`}
+            >
+              {currentView === item.id && (
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-orange-600 rounded-r-full" />
+              )}
+              <item.icon size={20} className={currentView === item.id ? 'text-orange-600' : 'text-neutral-400 group-hover:text-neutral-600 transition-colors'} />
+              <span>{item.label}</span>
             </a>
-          </li>
-          <li className={currentView === 'catalog' ? 'active' : ''}>
-            <a href="#" onClick={(e) => { e.preventDefault(); setCurrentView('catalog'); }} className="flex items-center gap-3">
-              <Map size={20} />
-              <span>Catálogo de Terrenos</span>
-            </a>
-          </li>
-          <li className={currentView === 'clients' ? 'active' : ''}>
-            <a href="#" onClick={(e) => { e.preventDefault(); setCurrentView('clients'); }} className="flex items-center gap-3">
-              <Users size={20} />
-              <span>Clientes</span>
-            </a>
-          </li>
-          <li className={currentView === 'payments' ? 'active' : ''}>
-            <a href="#" onClick={(e) => { e.preventDefault(); setCurrentView('payments'); }} className="flex items-center gap-3">
-              <CreditCard size={20} />
-              <span>Pagos</span>
-            </a>
-          </li>
-          <li className={currentView === 'settings' ? 'active' : ''}>
-            <a href="#" onClick={(e) => { e.preventDefault(); setCurrentView('settings'); }} className="flex items-center gap-3">
-              <Settings size={20} />
-              <span>Configuración</span>
-            </a>
-          </li>
-        </ul>
+          ))}
+        </div>
       </nav>
 
-      <div className="sidebar-footer">
-        <div className="sidebar-actions">
-          <button className="btn-primary w-full flex items-center justify-center gap-2">
-            <span>+</span> Nueva Venta
-          </button>
+      {/* Footer */}
+      <div className="p-4 border-t border-neutral-100">
+        <button className="w-full flex items-center justify-center gap-2 bg-neutral-900 hover:bg-neutral-800 text-white px-4 py-3 rounded-xl font-medium transition-colors mb-4 shadow-sm">
+          <Plus size={18} />
+          <span>Nueva Venta</span>
+        </button>
+        
+        <div className="space-y-1 mb-4">
+          <a href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900 font-medium transition-colors">
+            <HelpCircle size={18} className="text-neutral-400" />
+            <span className="text-sm">Soporte</span>
+          </a>
+          <a href="#" onClick={(e) => { e.preventDefault(); if (onLogout) onLogout(); }} className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-neutral-500 hover:bg-red-50 hover:text-red-600 font-medium transition-colors group">
+            <LogOut size={18} className="text-neutral-400 group-hover:text-red-500" />
+            <span className="text-sm">Cerrar Sesión</span>
+          </a>
         </div>
-        <ul>
-          <li>
-            <a href="#" className="flex items-center gap-3">
-              <HelpCircle size={20} />
-              <span>Soporte</span>
-            </a>
-          </li>
-          <li>
-            <a href="#" onClick={(e) => { e.preventDefault(); if (onLogout) onLogout(); }} className="flex items-center gap-3">
-              <LogOut size={20} />
-              <span>Cerrar Sesión</span>
-            </a>
-          </li>
-        </ul>
 
-        {/* Bottom User Profile */}
-        <div className="bottom-profile">
-          <img src="https://i.pravatar.cc/150?img=11" alt="J. Smith" className="bottom-profile-img" />
-          <div className="bottom-profile-info">
-            <span className="bottom-profile-name">J. Smith</span>
-            <span className="bottom-profile-role">Admin</span>
+        {/* User Profile */}
+        <div className="flex items-center gap-3 px-4 py-3 bg-neutral-50 rounded-xl border border-neutral-200/60">
+          <img src="https://i.pravatar.cc/150?img=11" alt="User Profile" className="w-9 h-9 rounded-full object-cover ring-2 ring-white shadow-sm" />
+          <div className="flex flex-col">
+            <span className="text-sm font-bold text-neutral-900">J. Smith</span>
+            <span className="text-xs font-medium text-neutral-500">Administrador</span>
           </div>
         </div>
       </div>

@@ -41,6 +41,24 @@ export interface TerrenoInput {
   notas: string;
 }
 
+export interface Cliente {
+  id: string;
+  nombre_completo: string;
+  email: string | null;
+  telefono: string | null;
+  direccion: string | null;
+  estado: 'Activo' | 'Pendiente' | string;
+  created_at: string;
+}
+
+export interface ClienteInput {
+  nombre_completo: string;
+  email: string;
+  telefono: string;
+  direccion: string;
+  estado: string;
+}
+
 // ─── API ──────────────────────────────────────────────────────────────────────
 
 export const api = {
@@ -90,6 +108,55 @@ export const api = {
         headers,
       });
       if (!res.ok) throw new Error('Error al eliminar terreno');
+    },
+  },
+
+  clientes: {
+    getAll: async (): Promise<Cliente[]> => {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_URL}/api/v1/clientes`, { headers });
+      if (!res.ok) throw new Error('Error al obtener clientes');
+      const json = await res.json();
+      return json.data as Cliente[];
+    },
+
+    create: async (input: ClienteInput): Promise<Cliente> => {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_URL}/api/v1/clientes`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(input),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message ?? 'Error al crear cliente');
+      }
+      const json = await res.json();
+      return json.data as Cliente;
+    },
+
+    update: async (id: string, input: ClienteInput): Promise<Cliente> => {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_URL}/api/v1/clientes/${id}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(input),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message ?? 'Error al actualizar cliente');
+      }
+      const json = await res.json();
+      return json.data as Cliente;
+    },
+
+    delete: async (id: string): Promise<void> => {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_URL}/api/v1/clientes/${id}`, {
+        method: 'DELETE',
+        headers,
+      });
+      if (!res.ok) throw new Error('Error al eliminar cliente');
     },
   },
 };

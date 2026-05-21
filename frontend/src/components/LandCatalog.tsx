@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Check, Pencil, Trash2, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Check, Pencil, Trash2, Loader2, AlertCircle, RefreshCw, Plus, MapPin } from 'lucide-react';
 import { useTerrenos } from '../hooks/useTerrenos';
 import type { Terreno, TerrenoInput } from '../lib/api';
 import TerrenoModal from './TerrenoModal';
-import './LandCatalog.css';
 
 const ESTADOS = ['Todos', 'disponible', 'apartado', 'vendido'] as const;
 const PAGE_SIZE = 10;
@@ -35,19 +34,16 @@ const LandCatalog = () => {
     setPage(1);
   };
 
-  // Abrir modal de creación
   const handleNuevoLote = () => {
     setEditTerreno(null);
     setModalOpen(true);
   };
 
-  // Abrir modal de edición
   const handleEdit = (t: Terreno) => {
     setEditTerreno(t);
     setModalOpen(true);
   };
 
-  // Eliminar con confirmación
   const handleDelete = async (t: Terreno) => {
     const confirmed = window.confirm(`¿Eliminar el lote ${t.clave}? Esta acción no se puede deshacer.`);
     if (!confirmed) return;
@@ -62,7 +58,6 @@ const LandCatalog = () => {
     }
   };
 
-  // Submit del modal (crear o editar)
   const handleModalSubmit = async (input: TerrenoInput) => {
     if (editTerreno) {
       await updateTerreno(editTerreno.id, input);
@@ -72,130 +67,158 @@ const LandCatalog = () => {
   };
 
   return (
-    <main className="catalog-container">
+    <main className="p-6 md:p-10 max-w-7xl mx-auto min-h-screen bg-neutral-50/50">
       {/* Header */}
-      <div className="catalog-header">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h2 className="catalog-title">Catálogo de Terrenos</h2>
-          <p className="catalog-subtitle">
+          <h2 className="text-3xl font-bold tracking-tight text-neutral-900">Catálogo de Terrenos</h2>
+          <p className="text-neutral-500 mt-1">
             Administra propiedades, disponibilidad y asignación de lotes.
           </p>
         </div>
-        <div className="header-actions">
-          <button className="btn-secondary icon-btn" onClick={refresh} title="Actualizar" disabled={loading}>
-            <RefreshCw size={16} className={loading ? 'spin' : ''} />
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={refresh} 
+            disabled={loading}
+            className="p-2.5 rounded-xl border border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50 transition-all shadow-sm disabled:opacity-50"
+            title="Actualizar"
+          >
+            <RefreshCw size={18} className={loading ? 'animate-spin text-orange-500' : ''} />
           </button>
-          <button className="btn-primary flex items-center gap-2" onClick={handleNuevoLote}>
-            <span>+</span> Nuevo Lote
+          <button 
+            onClick={handleNuevoLote}
+            className="flex items-center gap-2 bg-gradient-to-r from-orange-600 to-orange-500 text-white px-5 py-2.5 rounded-xl font-medium hover:from-orange-700 hover:to-orange-600 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+          >
+            <Plus size={18} /> <span>Nuevo Lote</span>
           </button>
         </div>
       </div>
 
       {/* Filtros */}
-      <div className="catalog-filters">
-        <span className="filter-label">Estado:</span>
-        <div className="filter-pills">
-          {ESTADOS.map(f => (
-            <button
-              key={f}
-              className={`pill ${filter === f ? 'active' : ''}`}
-              onClick={() => handleFilterChange(f)}
-            >
-              {f.charAt(0).toUpperCase() + f.slice(1)}
-            </button>
-          ))}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 bg-white p-4 rounded-2xl shadow-sm border border-neutral-100">
+        <div className="flex items-center gap-4">
+          <span className="text-sm font-medium text-neutral-500">Estado:</span>
+          <div className="flex flex-wrap gap-2">
+            {ESTADOS.map(f => (
+              <button
+                key={f}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
+                  filter === f 
+                    ? 'bg-orange-100 text-orange-700 shadow-sm ring-1 ring-orange-200' 
+                    : 'bg-neutral-50 text-neutral-600 hover:bg-neutral-100'
+                }`}
+                onClick={() => handleFilterChange(f)}
+              >
+                {f.charAt(0).toUpperCase() + f.slice(1)}
+              </button>
+            ))}
+          </div>
         </div>
-        <span className="filter-count">{filtered.length} lotes</span>
+        <span className="text-sm font-medium text-neutral-400 mt-4 sm:mt-0 px-2">
+          {filtered.length} {filtered.length === 1 ? 'lote' : 'lotes'}
+        </span>
       </div>
 
       {/* Error de acción */}
       {actionError && (
-        <div className="catalog-error">
-          <AlertCircle size={14} /> {actionError}
+        <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-xl flex items-center gap-3 border border-red-100 animate-in fade-in slide-in-from-top-2">
+          <AlertCircle size={18} /> 
+          <span className="font-medium">{actionError}</span>
         </div>
       )}
 
       {/* Tabla */}
-      <div className="table-container card">
+      <div className="bg-white rounded-2xl shadow-sm border border-neutral-200 overflow-hidden">
         {loading ? (
-          <div className="catalog-loading">
-            <Loader2 size={24} className="spin" />
-            <span>Cargando terrenos...</span>
+          <div className="flex flex-col items-center justify-center py-20 text-neutral-400">
+            <Loader2 size={32} className="animate-spin text-orange-500 mb-4" />
+            <span className="font-medium">Cargando terrenos...</span>
           </div>
         ) : error ? (
-          <div className="catalog-empty">
-            <AlertCircle size={32} />
-            <p>{error}</p>
-            <button className="btn-secondary" onClick={refresh}>Reintentar</button>
+          <div className="flex flex-col items-center justify-center py-20 text-red-500">
+            <AlertCircle size={48} className="mb-4 opacity-80" />
+            <p className="font-medium mb-4">{error}</p>
+            <button className="px-6 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 font-medium transition-colors" onClick={refresh}>Reintentar</button>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="catalog-empty">
-            <p>No hay terrenos con el filtro seleccionado.</p>
+          <div className="flex flex-col items-center justify-center py-24 text-neutral-400">
+            <MapPin size={48} className="mb-4 opacity-20" />
+            <p className="font-medium text-lg text-neutral-600">No se encontraron terrenos</p>
+            <p className="text-sm mt-1">Intenta ajustando los filtros o creando uno nuevo.</p>
           </div>
         ) : (
-          <>
-            <table className="catalog-table">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
               <thead>
-                <tr>
-                  <th>CLAVE</th>
-                  <th>NOMBRE / FASE</th>
-                  <th>SUPERFICIE (M²)</th>
-                  <th>PRECIO LISTA</th>
-                  <th>PROPIETARIO</th>
-                  <th>ESTADO</th>
-                  <th>ACCIONES</th>
+                <tr className="bg-neutral-50/80 border-b border-neutral-200">
+                  <th className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Clave</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Nombre / Fase</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider text-right">Superficie</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider text-right">Precio Lista</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Propietario</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Estado</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider text-center">Acciones</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-neutral-100">
                 {paginated.map((lot) => (
-                  <tr key={lot.id}>
-                    <td className="font-medium text-primary">{lot.clave}</td>
-                    <td>
-                      <div>
-                        <span>{lot.nombre ?? '—'}</span>
-                        {lot.fase && <span className="text-muted small-text"> · {lot.fase}</span>}
+                  <tr key={lot.id} className="hover:bg-orange-50/30 transition-colors group">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="font-semibold text-neutral-900 bg-neutral-100 px-2.5 py-1 rounded-md text-sm">{lot.clave}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col">
+                        <span className="font-medium text-neutral-800">{lot.nombre ?? '—'}</span>
+                        {lot.fase && <span className="text-xs text-neutral-500 mt-0.5">{lot.fase}</span>}
                       </div>
                     </td>
-                    <td>{Number(lot.superficie_m2).toFixed(2)}</td>
-                    <td>{formatPrice(lot.precio_lista)}</td>
-                    <td>
+                    <td className="px-6 py-4 text-right font-medium text-neutral-600">
+                      {Number(lot.superficie_m2).toFixed(2)} <span className="text-xs text-neutral-400">m²</span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <span className="font-semibold text-neutral-800">{formatPrice(lot.precio_lista)}</span>
+                    </td>
+                    <td className="px-6 py-4">
                       {lot.propietario ? (
-                        <div className="flex items-center gap-2">
-                          <div className="avatar-small">
+                        <div className="flex items-center gap-3">
+                          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-orange-200 to-orange-300 text-orange-800 flex items-center justify-center font-bold text-xs shadow-sm ring-2 ring-white">
                             {lot.propietario.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                           </div>
-                          <span>{lot.propietario}</span>
+                          <span className="font-medium text-neutral-700 text-sm">{lot.propietario}</span>
                         </div>
                       ) : (
-                        <span className="text-muted">—</span>
+                        <span className="text-neutral-300 italic text-sm">Sin asignar</span>
                       )}
                     </td>
-                    <td>
-                      <span className={`status-badge status-${lot.estado}`}>
-                        {lot.estado === 'vendido'
-                          ? <Check size={12} className="status-icon" />
-                          : <span className="status-dot"></span>}
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${
+                        lot.estado === 'vendido' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                        lot.estado === 'apartado' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                        'bg-blue-50 text-blue-700 border-blue-200'
+                      }`}>
+                        {lot.estado === 'vendido' 
+                          ? <Check size={12} strokeWidth={3} /> 
+                          : <span className={`w-1.5 h-1.5 rounded-full ${lot.estado === 'apartado' ? 'bg-amber-500' : 'bg-blue-500'}`}></span>
+                        }
                         {lot.estado.charAt(0).toUpperCase() + lot.estado.slice(1)}
                       </span>
                     </td>
-                    <td>
-                      <div className="action-buttons">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
-                          className="action-btn edit-btn"
+                          className="p-2 text-neutral-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
                           onClick={() => handleEdit(lot)}
                           title="Editar"
                         >
-                          <Pencil size={14} />
+                          <Pencil size={16} />
                         </button>
                         <button
-                          className="action-btn delete-btn"
+                          className="p-2 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
                           onClick={() => handleDelete(lot)}
                           disabled={deletingId === lot.id}
                           title="Eliminar"
                         >
-                          {deletingId === lot.id
-                            ? <Loader2 size={14} className="spin" />
-                            : <Trash2 size={14} />}
+                          {deletingId === lot.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
                         </button>
                       </div>
                     </td>
@@ -203,26 +226,38 @@ const LandCatalog = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
 
-            <div className="table-footer">
-              <span className="showing-text">
-                Mostrando {Math.min((page - 1) * PAGE_SIZE + 1, filtered.length)}–{Math.min(page * PAGE_SIZE, filtered.length)} de {filtered.length} registros
+        {/* Paginación */}
+        {!loading && !error && filtered.length > 0 && (
+          <div className="flex items-center justify-between px-6 py-4 border-t border-neutral-100 bg-neutral-50/50">
+            <span className="text-sm text-neutral-500">
+              Mostrando <span className="font-medium text-neutral-900">{Math.min((page - 1) * PAGE_SIZE + 1, filtered.length)}</span> a <span className="font-medium text-neutral-900">{Math.min(page * PAGE_SIZE, filtered.length)}</span> de <span className="font-medium text-neutral-900">{filtered.length}</span> resultados
+            </span>
+            <div className="flex items-center gap-2">
+              <button 
+                className="p-1.5 rounded-lg border border-neutral-200 text-neutral-600 hover:bg-white disabled:opacity-50 disabled:hover:bg-transparent transition-colors" 
+                onClick={() => setPage(p => Math.max(1, p - 1))} 
+                disabled={page === 1}
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <span className="text-sm font-medium px-4 text-neutral-700">
+                Página {page} de {totalPages}
               </span>
-              <div className="pagination">
-                <button className="page-btn" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>
-                  <ChevronLeft size={16} />
-                </button>
-                <span className="page-indicator">{page} / {totalPages}</span>
-                <button className="page-btn" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}>
-                  <ChevronRight size={16} />
-                </button>
-              </div>
+              <button 
+                className="p-1.5 rounded-lg border border-neutral-200 text-neutral-600 hover:bg-white disabled:opacity-50 disabled:hover:bg-transparent transition-colors" 
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))} 
+                disabled={page === totalPages}
+              >
+                <ChevronRight size={18} />
+              </button>
             </div>
-          </>
+          </div>
         )}
       </div>
 
-      {/* Modal crear / editar */}
       <TerrenoModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -234,3 +269,4 @@ const LandCatalog = () => {
 };
 
 export default LandCatalog;
+

@@ -8,7 +8,6 @@ import Payments from './components/Payments';
 import Settings from './components/Settings';
 import Login from './components/Login';
 import { useAuth } from './hooks/useAuth';
-import './App.css';
 
 function App() {
   const { user, loading, signIn, signOut } = useAuth();
@@ -17,7 +16,6 @@ function App() {
   const handleLogin = async (email: string, password: string) => {
     const { error } = await signIn(email, password);
     if (error) {
-      // Traducir mensajes de error de Supabase al español
       const mensajesError: Record<string, string> = {
         'Invalid login credentials': 'Correo o contraseña incorrectos.',
         'Email not confirmed': 'Por favor, confirma tu correo antes de iniciar sesión.',
@@ -29,33 +27,32 @@ function App() {
     return { error: null };
   };
 
-  // Pantalla de carga mientras Supabase verifica la sesión
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: 'var(--bg-primary)' }}>
-        <div style={{ textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+      <div className="flex justify-center items-center min-h-screen bg-neutral-50">
+        <div className="text-center text-neutral-500 text-sm">
           Cargando...
         </div>
       </div>
     );
   }
 
-  // Si no hay sesión activa, mostrar Login
   if (!user) {
     return <Login onLogin={handleLogin} />;
   }
 
-  // Sesión activa: mostrar el sistema
   return (
-    <div className="app-container">
+    <div className="flex h-screen w-screen overflow-hidden bg-neutral-50 font-sans text-neutral-900">
       <Sidebar currentView={currentView} setCurrentView={setCurrentView} onLogout={signOut} />
-      <div className="main-layout">
+      <div className="flex-1 flex flex-col h-screen overflow-hidden relative">
         <Header />
-        {currentView === 'dashboard' && <Dashboard />}
-        {currentView === 'catalog' && <LandCatalog />}
-        {currentView === 'clients' && <Clients />}
-        {currentView === 'payments' && <Payments />}
-        {currentView === 'settings' && <Settings />}
+        <div className="flex-1 overflow-y-auto">
+          {currentView === 'dashboard' && <Dashboard />}
+          {currentView === 'catalog' && <LandCatalog />}
+          {currentView === 'clients' && <Clients />}
+          {currentView === 'payments' && <Payments />}
+          {currentView === 'settings' && <Settings />}
+        </div>
       </div>
     </div>
   );

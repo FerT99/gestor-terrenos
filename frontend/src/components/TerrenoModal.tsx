@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Loader2 } from 'lucide-react';
 import type { Terreno, TerrenoInput } from '../lib/api';
-import './TerrenoModal.css';
 
 interface TerrenoModalProps {
   isOpen: boolean;
@@ -29,7 +28,6 @@ const TerrenoModal: React.FC<TerrenoModalProps> = ({ isOpen, onClose, onSubmit, 
 
   const isEditing = !!terreno;
 
-  // Pre-llenar form si es edición
   useEffect(() => {
     if (terreno) {
       setForm({
@@ -78,38 +76,62 @@ const TerrenoModal: React.FC<TerrenoModalProps> = ({ isOpen, onClose, onSubmit, 
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-container" onClick={e => e.stopPropagation()}>
-        <div className="modal-header">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6" onClick={onClose}>
+      <div className="absolute inset-0 bg-neutral-900/40 backdrop-blur-sm transition-opacity" />
+      
+      <div 
+        className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between px-6 py-5 border-b border-neutral-100 bg-neutral-50/50">
           <div>
-            <h2 className="modal-title">{isEditing ? 'Editar Terreno' : 'Nuevo Terreno'}</h2>
-            <p className="modal-subtitle">{isEditing ? `Modificando: ${terreno!.clave}` : 'Registra un nuevo lote en el catálogo'}</p>
+            <h2 className="text-xl font-bold text-neutral-900">{isEditing ? 'Editar Terreno' : 'Nuevo Terreno'}</h2>
+            <p className="text-sm text-neutral-500 mt-1">{isEditing ? `Modificando: ${terreno!.clave}` : 'Registra un nuevo lote en el catálogo'}</p>
           </div>
-          <button className="modal-close-btn" onClick={onClose} disabled={saving}>
+          <button 
+            className="p-2 -mr-2 text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 rounded-full transition-colors disabled:opacity-50" 
+            onClick={onClose} 
+            disabled={saving}
+          >
             <X size={20} />
           </button>
         </div>
 
-        <form className="modal-form" onSubmit={handleSubmit}>
-          <div className="modal-grid-2">
-            <div className="form-field">
-              <label htmlFor="clave">Clave <span className="required">*</span></label>
-              <input id="clave" name="clave" type="text" placeholder="Ej. SL-045" value={form.clave} onChange={handleChange} />
+        <form className="p-6 overflow-y-auto max-h-[calc(100vh-10rem)]" onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
+            <div className="space-y-1.5">
+              <label htmlFor="clave" className="text-sm font-medium text-neutral-700">Clave <span className="text-red-500">*</span></label>
+              <input 
+                id="clave" name="clave" type="text" placeholder="Ej. SL-045" 
+                value={form.clave} onChange={handleChange} 
+                className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+              />
             </div>
-            <div className="form-field">
-              <label htmlFor="nombre">Nombre</label>
-              <input id="nombre" name="nombre" type="text" placeholder="Ej. Lote Norte A" value={form.nombre} onChange={handleChange} />
+            <div className="space-y-1.5">
+              <label htmlFor="nombre" className="text-sm font-medium text-neutral-700">Nombre</label>
+              <input 
+                id="nombre" name="nombre" type="text" placeholder="Ej. Lote Norte A" 
+                value={form.nombre} onChange={handleChange} 
+                className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+              />
             </div>
           </div>
 
-          <div className="modal-grid-2">
-            <div className="form-field">
-              <label htmlFor="fase">Fase / Sección</label>
-              <input id="fase" name="fase" type="text" placeholder="Ej. Fase 1" value={form.fase} onChange={handleChange} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
+            <div className="space-y-1.5">
+              <label htmlFor="fase" className="text-sm font-medium text-neutral-700">Fase / Sección</label>
+              <input 
+                id="fase" name="fase" type="text" placeholder="Ej. Fase 1" 
+                value={form.fase} onChange={handleChange} 
+                className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+              />
             </div>
-            <div className="form-field">
-              <label htmlFor="estado">Estado <span className="required">*</span></label>
-              <select id="estado" name="estado" value={form.estado} onChange={handleChange}>
+            <div className="space-y-1.5">
+              <label htmlFor="estado" className="text-sm font-medium text-neutral-700">Estado <span className="text-red-500">*</span></label>
+              <select 
+                id="estado" name="estado" value={form.estado} onChange={handleChange}
+                className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+              >
                 <option value="disponible">Disponible</option>
                 <option value="apartado">Apartado</option>
                 <option value="vendido">Vendido</option>
@@ -117,45 +139,69 @@ const TerrenoModal: React.FC<TerrenoModalProps> = ({ isOpen, onClose, onSubmit, 
             </div>
           </div>
 
-          <div className="modal-grid-2">
-            <div className="form-field">
-              <label htmlFor="superficie_m2">Superficie (m²) <span className="required">*</span></label>
-              <input id="superficie_m2" name="superficie_m2" type="number" step="0.01" min="0"
-                placeholder="450.00" value={form.superficie_m2 || ''} onChange={handleChange} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
+            <div className="space-y-1.5">
+              <label htmlFor="superficie_m2" className="text-sm font-medium text-neutral-700">Superficie (m²) <span className="text-red-500">*</span></label>
+              <input 
+                id="superficie_m2" name="superficie_m2" type="number" step="0.01" min="0" placeholder="450.00" 
+                value={form.superficie_m2 || ''} onChange={handleChange} 
+                className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+              />
             </div>
-            <div className="form-field">
-              <label htmlFor="precio_lista">Precio Lista (MXN) <span className="required">*</span></label>
-              <input id="precio_lista" name="precio_lista" type="number" step="0.01" min="0"
-                placeholder="1250000" value={form.precio_lista || ''} onChange={handleChange} />
+            <div className="space-y-1.5">
+              <label htmlFor="precio_lista" className="text-sm font-medium text-neutral-700">Precio Lista (MXN) <span className="text-red-500">*</span></label>
+              <input 
+                id="precio_lista" name="precio_lista" type="number" step="0.01" min="0" placeholder="1250000" 
+                value={form.precio_lista || ''} onChange={handleChange} 
+                className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+              />
             </div>
           </div>
 
-          <div className="form-field">
-            <label htmlFor="propietario">Propietario / Cliente asignado</label>
-            <input id="propietario" name="propietario" type="text" placeholder="Nombre del propietario (opcional)"
-              value={form.propietario} onChange={handleChange} />
+          <div className="space-y-1.5 mb-5">
+            <label htmlFor="propietario" className="text-sm font-medium text-neutral-700">Propietario / Cliente asignado</label>
+            <input 
+              id="propietario" name="propietario" type="text" placeholder="Nombre del propietario (opcional)"
+              value={form.propietario} onChange={handleChange} 
+              className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+            />
           </div>
 
-          <div className="form-field">
-            <label htmlFor="coordenadas">Coordenadas</label>
-            <input id="coordenadas" name="coordenadas" type="text" placeholder="Ej. 21.1619,-86.8515 (opcional)"
-              value={form.coordenadas} onChange={handleChange} />
+          <div className="space-y-1.5 mb-5">
+            <label htmlFor="coordenadas" className="text-sm font-medium text-neutral-700">Coordenadas</label>
+            <input 
+              id="coordenadas" name="coordenadas" type="text" placeholder="Ej. 21.1619,-86.8515 (opcional)"
+              value={form.coordenadas} onChange={handleChange} 
+              className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+            />
           </div>
 
-          <div className="form-field">
-            <label htmlFor="notas">Notas</label>
-            <textarea id="notas" name="notas" rows={3} placeholder="Observaciones adicionales (opcional)"
-              value={form.notas} onChange={handleChange} />
+          <div className="space-y-1.5 mb-6">
+            <label htmlFor="notas" className="text-sm font-medium text-neutral-700">Notas</label>
+            <textarea 
+              id="notas" name="notas" rows={3} placeholder="Observaciones adicionales (opcional)"
+              value={form.notas} onChange={handleChange} 
+              className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all resize-none"
+            />
           </div>
 
-          {error && <p className="modal-error">{error}</p>}
+          {error && <p className="mb-4 text-sm font-medium text-red-600 bg-red-50 p-3 rounded-lg border border-red-100">{error}</p>}
 
-          <div className="modal-actions">
-            <button type="button" className="btn-secondary" onClick={onClose} disabled={saving}>
+          <div className="flex items-center justify-end gap-3 pt-5 border-t border-neutral-100">
+            <button 
+              type="button" 
+              className="px-5 py-2.5 text-sm font-medium text-neutral-600 hover:bg-neutral-100 rounded-xl transition-colors disabled:opacity-50" 
+              onClick={onClose} 
+              disabled={saving}
+            >
               Cancelar
             </button>
-            <button type="submit" className="btn-primary" disabled={saving}>
-              {saving ? <Loader2 size={16} className="spin" /> : null}
+            <button 
+              type="submit" 
+              className="flex items-center gap-2 bg-gradient-to-r from-orange-600 to-orange-500 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:from-orange-700 hover:to-orange-600 transition-all shadow-md hover:shadow-lg disabled:opacity-70" 
+              disabled={saving}
+            >
+              {saving ? <Loader2 size={16} className="animate-spin" /> : null}
               {saving ? 'Guardando...' : isEditing ? 'Guardar Cambios' : 'Crear Terreno'}
             </button>
           </div>
