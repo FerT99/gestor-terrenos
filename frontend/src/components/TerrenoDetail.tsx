@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Banknote, Calendar, CheckCircle2, AlertTriangle, ExternalLink, Loader2 } from 'lucide-react';
-import { api, type Terreno, type PlanPago, type PeriodoPago, type Abono } from '../lib/api';
+import { api, type Terreno, type PlanPago, type Abono } from '../lib/api';
 
 interface TerrenoDetailProps {
   terrenoId: string;
