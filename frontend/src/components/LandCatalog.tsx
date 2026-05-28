@@ -10,7 +10,12 @@ const PAGE_SIZE = 10;
 const formatPrice = (price: number) =>
   `$${price.toLocaleString('es-MX', { minimumFractionDigits: 0 })} MXN`;
 
-const LandCatalog = () => {
+interface LandCatalogProps {
+  searchQuery?: string;
+  onSelectTerreno?: (id: string) => void;
+}
+
+const LandCatalog: React.FC<LandCatalogProps> = ({ searchQuery = '', onSelectTerreno }) => {
   const { terrenos, loading, error, refresh, createTerreno, updateTerreno, deleteTerreno } = useTerrenos();
 
   const [filter, setFilter] = useState<string>('Todos');
@@ -21,9 +26,15 @@ const LandCatalog = () => {
   const [actionError, setActionError] = useState<string | null>(null);
 
   // Filtrado
-  const filtered = filter === 'Todos'
-    ? terrenos
-    : terrenos.filter(t => t.estado === filter);
+  const filtered = terrenos.filter(t => {
+    const matchesFilter = filter === 'Todos' || t.estado === filter;
+    const q = searchQuery.toLowerCase();
+    const matchesSearch = !q || 
+      t.clave.toLowerCase().includes(q) || 
+      (t.nombre && t.nombre.toLowerCase().includes(q)) || 
+      (t.propietario && t.propietario.toLowerCase().includes(q));
+    return matchesFilter && matchesSearch;
+  });
 
   // Paginación
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -77,15 +88,15 @@ const LandCatalog = () => {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button 
-            onClick={refresh} 
+          <button
+            onClick={refresh}
             disabled={loading}
             className="p-2.5 rounded-xl border border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50 transition-all shadow-sm disabled:opacity-50"
             title="Actualizar"
           >
             <RefreshCw size={18} className={loading ? 'animate-spin text-orange-500' : ''} />
           </button>
-          <button 
+          <button
             onClick={handleNuevoLote}
             className="flex items-center gap-2 bg-gradient-to-r from-orange-600 to-orange-500 text-white px-5 py-2.5 rounded-xl font-medium hover:from-orange-700 hover:to-orange-600 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
           >
@@ -102,11 +113,10 @@ const LandCatalog = () => {
             {ESTADOS.map(f => (
               <button
                 key={f}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
-                  filter === f 
-                    ? 'bg-orange-100 text-orange-700 shadow-sm ring-1 ring-orange-200' 
-                    : 'bg-neutral-50 text-neutral-600 hover:bg-neutral-100'
-                }`}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${filter === f
+                  ? 'bg-orange-100 text-orange-700 shadow-sm ring-1 ring-orange-200'
+                  : 'bg-neutral-50 text-neutral-600 hover:bg-neutral-100'
+                  }`}
                 onClick={() => handleFilterChange(f)}
               >
                 {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -122,7 +132,7 @@ const LandCatalog = () => {
       {/* Error de acción */}
       {actionError && (
         <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-xl flex items-center gap-3 border border-red-100 animate-in fade-in slide-in-from-top-2">
-          <AlertCircle size={18} /> 
+          <AlertCircle size={18} />
           <span className="font-medium">{actionError}</span>
         </div>
       )}
@@ -152,7 +162,6 @@ const LandCatalog = () => {
               <thead>
                 <tr className="bg-neutral-50/80 border-b border-neutral-200">
                   <th className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Clave</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Nombre / Fase</th>
                   <th className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider text-right">Superficie</th>
                   <th className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider text-right">Precio Lista</th>
                   <th className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Propietario</th>
@@ -161,64 +170,62 @@ const LandCatalog = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-100">
-                {paginated.map((lot) => (
-                  <tr key={lot.id} className="hover:bg-orange-50/30 transition-colors group">
+                {paginated.map(t => (
+                  <tr 
+                    key={t.id} 
+                    className="hover:bg-neutral-50 transition-colors group cursor-pointer"
+                    onClick={() => onSelectTerreno && onSelectTerreno(t.id)}
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="font-semibold text-neutral-900 bg-neutral-100 px-2.5 py-1 rounded-md text-sm">{lot.clave}</span>
+                      <span className="font-semibold text-neutral-900 bg-neutral-100 px-2.5 py-1 rounded-md text-sm">{t.clave}</span>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col">
-                        <span className="font-medium text-neutral-800">{lot.nombre ?? '—'}</span>
-                        {lot.fase && <span className="text-xs text-neutral-500 mt-0.5">{lot.fase}</span>}
-                      </div>
-                    </td>
+
                     <td className="px-6 py-4 text-right font-medium text-neutral-600">
-                      {Number(lot.superficie_m2).toFixed(2)} <span className="text-xs text-neutral-400">m²</span>
+                      {Number(t.superficie_m2).toFixed(2)} <span className="text-xs text-neutral-400">m²</span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <span className="font-semibold text-neutral-800">{formatPrice(lot.precio_lista)}</span>
+                      <span className="font-semibold text-neutral-800">{formatPrice(t.precio_lista)}</span>
                     </td>
                     <td className="px-6 py-4">
-                      {lot.propietario ? (
+                      {t.propietario ? (
                         <div className="flex items-center gap-3">
                           <div className="h-8 w-8 rounded-full bg-gradient-to-br from-orange-200 to-orange-300 text-orange-800 flex items-center justify-center font-bold text-xs shadow-sm ring-2 ring-white">
-                            {lot.propietario.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                            {t.propietario.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                           </div>
-                          <span className="font-medium text-neutral-700 text-sm">{lot.propietario}</span>
+                          <span className="font-medium text-neutral-700 text-sm">{t.propietario}</span>
                         </div>
                       ) : (
                         <span className="text-neutral-300 italic text-sm">Sin asignar</span>
                       )}
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${
-                        lot.estado === 'vendido' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                        lot.estado === 'apartado' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                        'bg-blue-50 text-blue-700 border-blue-200'
-                      }`}>
-                        {lot.estado === 'vendido' 
-                          ? <Check size={12} strokeWidth={3} /> 
-                          : <span className={`w-1.5 h-1.5 rounded-full ${lot.estado === 'apartado' ? 'bg-amber-500' : 'bg-blue-500'}`}></span>
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${t.estado === 'vendido' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                        t.estado === 'apartado' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                          'bg-blue-50 text-blue-700 border-blue-200'
+                        }`}>
+                        {t.estado === 'vendido'
+                          ? <Check size={12} strokeWidth={3} />
+                          : <span className={`w-1.5 h-1.5 rounded-full ${t.estado === 'apartado' ? 'bg-amber-500' : 'bg-blue-500'}`}></span>
                         }
-                        {lot.estado.charAt(0).toUpperCase() + lot.estado.slice(1)}
+                        {t.estado.charAt(0).toUpperCase() + t.estado.slice(1)}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
                         <button
-                          className="p-2 text-neutral-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
-                          onClick={() => handleEdit(lot)}
-                          title="Editar"
+                          className="p-2 text-neutral-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors tooltip-trigger"
+                          onClick={() => handleEdit(t)}
+                          title="Editar lote"
                         >
-                          <Pencil size={16} />
+                          <Pencil size={18} />
                         </button>
                         <button
-                          className="p-2 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
-                          onClick={() => handleDelete(lot)}
-                          disabled={deletingId === lot.id}
-                          title="Eliminar"
+                          className="p-2 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors tooltip-trigger"
+                          onClick={() => handleDelete(t)}
+                          disabled={deletingId === t.id}
+                          title="Eliminar lote"
                         >
-                          {deletingId === lot.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+                          {deletingId === t.id ? <Loader2 size={18} className="animate-spin" /> : <Trash2 size={18} />}
                         </button>
                       </div>
                     </td>
@@ -236,9 +243,9 @@ const LandCatalog = () => {
               Mostrando <span className="font-medium text-neutral-900">{Math.min((page - 1) * PAGE_SIZE + 1, filtered.length)}</span> a <span className="font-medium text-neutral-900">{Math.min(page * PAGE_SIZE, filtered.length)}</span> de <span className="font-medium text-neutral-900">{filtered.length}</span> resultados
             </span>
             <div className="flex items-center gap-2">
-              <button 
-                className="p-1.5 rounded-lg border border-neutral-200 text-neutral-600 hover:bg-white disabled:opacity-50 disabled:hover:bg-transparent transition-colors" 
-                onClick={() => setPage(p => Math.max(1, p - 1))} 
+              <button
+                className="p-1.5 rounded-lg border border-neutral-200 text-neutral-600 hover:bg-white disabled:opacity-50 disabled:hover:bg-transparent transition-colors"
+                onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
               >
                 <ChevronLeft size={18} />
@@ -246,9 +253,9 @@ const LandCatalog = () => {
               <span className="text-sm font-medium px-4 text-neutral-700">
                 Página {page} de {totalPages}
               </span>
-              <button 
-                className="p-1.5 rounded-lg border border-neutral-200 text-neutral-600 hover:bg-white disabled:opacity-50 disabled:hover:bg-transparent transition-colors" 
-                onClick={() => setPage(p => Math.min(totalPages, p + 1))} 
+              <button
+                className="p-1.5 rounded-lg border border-neutral-200 text-neutral-600 hover:bg-white disabled:opacity-50 disabled:hover:bg-transparent transition-colors"
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
               >
                 <ChevronRight size={18} />

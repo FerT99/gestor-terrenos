@@ -1,8 +1,42 @@
-import React from 'react';
-import { Building2, Gavel, RefreshCw, Sliders, AlertTriangle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Building2, Gavel, RefreshCw, Sliders, AlertTriangle, Map, Plus } from 'lucide-react';
+import { api, type Parcela } from '../lib/api';
 import './Settings.css';
 
 const Settings = () => {
+  const [parcelas, setParcelas] = useState<Parcela[]>([]);
+  const [newParcelaName, setNewParcelaName] = useState('');
+  const [newParcelaDesc, setNewParcelaDesc] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    loadParcelas();
+  }, []);
+
+  const loadParcelas = async () => {
+    try {
+      const data = await api.parcelas.getAll();
+      setParcelas(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleCreateParcela = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newParcelaName) return;
+    setLoading(true);
+    try {
+      await api.parcelas.create({ nombre: newParcelaName, descripcion: newParcelaDesc });
+      setNewParcelaName('');
+      setNewParcelaDesc('');
+      await loadParcelas();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <main className="settings-container">
       <div className="settings-header">
@@ -93,6 +127,63 @@ const Settings = () => {
                 <input type="checkbox" defaultChecked />
                 <span className="slider round"></span>
               </label>
+            </div>
+          </div>
+
+          {/* Parcelas Card */}
+          <div className="card settings-card">
+            <div className="card-header">
+              <Map size={20} className="card-icon" />
+              <h3 className="card-title">Gestión de Parcelas</h3>
+            </div>
+            <p className="card-desc mb-4">Administra las parcelas donde se agrupan los terrenos y ventas.</p>
+
+            <div className="space-y-3 mb-6">
+              {parcelas.map(p => (
+                <div key={p.id} className="flex items-center justify-between p-3 bg-neutral-50 rounded-xl border border-neutral-200">
+                  <div>
+                    <p className="font-semibold text-neutral-900 text-sm">{p.nombre}</p>
+                    <p className="text-xs text-neutral-500">{p.descripcion || 'Sin descripción'}</p>
+                  </div>
+                  <span className="text-xs font-medium text-neutral-400">ID: {p.id.split('-')[0]}...</span>
+                </div>
+              ))}
+              {parcelas.length === 0 && (
+                <p className="text-sm text-neutral-500 text-center py-2">No hay parcelas creadas.</p>
+              )}
+            </div>
+
+            <div className="border-t border-neutral-100 pt-4">
+              <h4 className="text-sm font-medium text-neutral-900 mb-3">Registrar Nueva Parcela</h4>
+              <form onSubmit={handleCreateParcela} className="space-y-3">
+                <div className="form-group">
+                  <input 
+                    type="text" 
+                    placeholder="Nombre de la parcela (Ej. Villa del Sol)" 
+                    className="form-input" 
+                    value={newParcelaName}
+                    onChange={e => setNewParcelaName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <input 
+                    type="text" 
+                    placeholder="Descripción (opcional)" 
+                    className="form-input" 
+                    value={newParcelaDesc}
+                    onChange={e => setNewParcelaDesc(e.target.value)}
+                  />
+                </div>
+                <button 
+                  type="submit" 
+                  disabled={loading || !newParcelaName}
+                  className="w-full flex items-center justify-center gap-2 bg-orange-50 hover:bg-orange-100 text-orange-700 px-4 py-2.5 rounded-xl font-medium transition-colors border border-orange-200 disabled:opacity-50"
+                >
+                  <Plus size={16} />
+                  <span>{loading ? 'Creando...' : 'Crear Parcela'}</span>
+                </button>
+              </form>
             </div>
           </div>
         </div>

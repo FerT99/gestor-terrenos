@@ -1,8 +1,9 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { CheckCircle2, Wallet, AlertTriangle } from 'lucide-react';
 import SummaryCard from './SummaryCard';
 import RevenueChart from './RevenueChart';
 import OverdueClients from './OverdueClients';
+import AuditLogViewer from './AuditLogViewer';
 
 const Dashboard = () => {
   return (
@@ -15,23 +16,23 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <SummaryCard 
           title="Lotes Vendidos" 
-          value="42" 
+          value="0" 
           subtitle="vs mes anterior" 
           icon={<CheckCircle2 size={18} />} 
-          trend="12%" 
+          trend="0%" 
           trendUp={true} 
         />
         <SummaryCard 
           title="Cobros del Mes (MXN)" 
-          value="$1.2M" 
-          subtitle="USD: $68K" 
+          value="$0" 
+          subtitle="USD: $0" 
           icon={<Wallet size={18} />} 
-          trend="5%" 
+          trend="0%" 
           trendUp={true} 
         />
         <SummaryCard 
           title="Adeudos Vencidos" 
-          value="14" 
+          value="0" 
           subtitle="! Acción requerida" 
           icon={<AlertTriangle size={18} />} 
           isAlert={true} 
@@ -46,6 +47,8 @@ const Dashboard = () => {
           <OverdueClients />
         </div>
       </div>
+
+      <AuditLogViewer />
     </main>
   );
 };

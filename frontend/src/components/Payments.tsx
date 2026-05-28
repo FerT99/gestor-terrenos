@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { 
   PlusCircle, 
   Wallet, 
@@ -6,184 +6,227 @@ import {
   AlertTriangle, 
   Calendar, 
   Filter, 
-  Landmark,
   Banknote,
-  CreditCard as CreditCardIcon
+  CheckCircle2
 } from 'lucide-react';
-import './Payments.css';
-
-const recentPayments = [
-  { id: 1, client: 'Alejandro Ruiz', lot: 'Lote SL 045', amount: '$15,000 MXN', date: '24 Oct, 2023', method: 'Transferencia', methodIcon: <Landmark size={14}/>, status: 'Verificado' },
-  { id: 2, client: 'Maria Fernandez', lot: 'Lote SL 112', amount: '$800 USD', date: '23 Oct, 2023', method: 'Efectivo', methodIcon: <Banknote size={14}/>, status: 'Pendiente' },
-  { id: 3, client: 'Carlos Gomez', lot: 'Lote AZ 004', amount: '$12,500 MXN', date: '22 Oct, 2023', method: 'Transferencia', methodIcon: <Landmark size={14}/>, status: 'Verificado' },
-  { id: 4, client: 'Sofia Reyes', lot: 'Lote SL 088', amount: '$20,000 MXN', date: '21 Oct, 2023', method: 'Tarjeta', methodIcon: <CreditCardIcon size={14}/>, status: 'Verificado' },
-];
-
-const overdueDebts = [
-  { id: 1, client: 'Roberto Sanchez', lot: 'Lote SL 012', days: 45, type: 'Capital + Penalización', amount: '$18,400 MXN', action: 'Contactar' },
-  { id: 2, client: 'Empresa del Norte SA', lot: 'Lote IND 05', days: 32, type: 'Capital + Penalización', amount: '$45,000 MXN', action: 'Contactar' },
-  { id: 3, client: 'Elena Vazquez', lot: 'Lote SL 099', days: 12, type: 'Monto Pendiente', amount: '$8,500 MXN', action: 'Recordatorio' },
-];
+import { api, type Abono, type ClienteMoroso } from '../lib/api';
+import NewPaymentModal from './NewPaymentModal';
+import ErrorBoundary from './ErrorBoundary';
 
 const Payments = () => {
+  const [abonos, setAbonos] = useState<Abono[]>([]);
+  const [morosos, setMorosos] = useState<ClienteMoroso[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const fetchData = async () => {
+    try {
+      const [abonosData, morososData] = await Promise.all([
+        api.abonos.getAll(),
+        api.reportes.getMorosos()
+      ]);
+      setAbonos(abonosData || []);
+      setMorosos(morososData || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const handleSuccess = () => {
+    setIsModalOpen(false);
+    fetchData(); // Reload table after payment
+  };
+
+  const totalCobros = (abonos || []).reduce((acc, curr) => acc + curr.monto_pagado, 0);
+  const totalMora = (morosos || []).reduce((acc, curr) => acc + curr.monto_esperado, 0);
+
   return (
-    <main className="payments-container">
-      <div className="payments-header">
+    <ErrorBoundary>
+      <main className="p-6 md:p-10 max-w-7xl mx-auto min-h-[calc(100vh-4rem)] bg-neutral-50/50">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h2 className="payments-title">Gestión de Pagos</h2>
-          <p className="payments-subtitle">Administración de abonos, moratoria y estado de cuenta de clientes.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-neutral-900">Gestión de Pagos</h2>
+          <p className="text-neutral-500 mt-1">Administración de abonos, moratoria y estado de cuenta de clientes.</p>
         </div>
-        <button className="btn-primary flex items-center gap-2">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-2 bg-gradient-to-r from-orange-600 to-orange-500 text-white px-5 py-2.5 rounded-xl font-medium hover:from-orange-700 hover:to-orange-600 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+        >
           <PlusCircle size={18} />
           <span>Registrar Abono</span>
         </button>
       </div>
 
-      <div className="payments-summary">
-        <div className="summary-card card">
-          <div className="summary-header">
-            <div className="summary-icon-wrapper">
-              <Wallet size={16} />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-200">
+          <div className="flex justify-between items-start mb-4">
+            <div className="w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center">
+              <Wallet size={20} />
             </div>
-            <span className="trend-badge">+12% vs mes anterior</span>
+            <span className="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">Activo</span>
           </div>
-          <div className="summary-body">
-            <span className="summary-label">Cobros del Mes (MXN)</span>
-            <span className="summary-value">$1,450,000</span>
+          <div className="flex flex-col">
+            <span className="text-sm font-medium text-neutral-500 mb-1">Cobros Registrados</span>
+            <span className="text-2xl font-bold text-neutral-900">
+              ${totalCobros.toLocaleString(undefined, {minimumFractionDigits: 2})}
+            </span>
           </div>
         </div>
         
-        <div className="summary-card card">
-          <div className="summary-header">
-            <div className="summary-icon-wrapper">
-              <DollarSign size={16} />
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-200">
+          <div className="flex justify-between items-start mb-4">
+            <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+              <DollarSign size={20} />
             </div>
-            <span className="trend-badge">+5% vs mes anterior</span>
           </div>
-          <div className="summary-body">
-            <span className="summary-label">Cobros del Mes (USD)</span>
-            <span className="summary-value">$85,400</span>
+          <div className="flex flex-col">
+            <span className="text-sm font-medium text-neutral-500 mb-1">Abonos Realizados</span>
+            <span className="text-2xl font-bold text-neutral-900">{(abonos || []).length}</span>
           </div>
         </div>
 
-        <div className="summary-card card alert">
-          <div className="summary-header">
-            <div className="summary-icon-wrapper alert-icon">
-              <AlertTriangle size={16} />
+        <div className="bg-red-50 rounded-2xl p-6 shadow-sm border border-red-200">
+          <div className="flex justify-between items-start mb-4">
+            <div className="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center">
+              <AlertTriangle size={20} />
             </div>
-            <span className="trend-badge alert-badge">Incluye 15% penalización</span>
+            <span className="text-xs font-medium text-red-600 bg-red-100 px-2 py-1 rounded-full">En Riesgo</span>
           </div>
-          <div className="summary-body">
-            <span className="summary-label">Total en Mora</span>
-            <span className="summary-value alert-text">$345,000 MXN</span>
+          <div className="flex flex-col">
+            <span className="text-sm font-medium text-red-600/80 mb-1">Monto en Mora</span>
+            <span className="text-2xl font-bold text-red-600">
+              ${totalMora.toLocaleString(undefined, {minimumFractionDigits: 2})}
+            </span>
           </div>
         </div>
       </div>
 
-      <div className="payments-content">
-        <div className="payments-main">
-          <div className="filters-row">
-            <div className="filter-dropdown">
-              <Calendar size={14} className="filter-icon"/>
-              <span>Este Mes</span>
-            </div>
-            <div className="filter-dropdown">
-              <DollarSign size={14} className="filter-icon"/>
-              <span>Todas las Monedas</span>
-            </div>
-            <div className="filter-dropdown">
-              <Filter size={14} className="filter-icon"/>
-              <span>Todos los Estados</span>
-            </div>
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div className="xl:col-span-2 space-y-6">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button className="flex flex-1 items-center justify-center gap-2 px-4 py-2.5 bg-white border border-neutral-200 rounded-xl text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors">
+              <Calendar size={16} className="text-neutral-400" />
+              <span>Todos los tiempos</span>
+            </button>
+            <button className="flex flex-1 items-center justify-center gap-2 px-4 py-2.5 bg-white border border-neutral-200 rounded-xl text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors">
+              <Filter size={16} className="text-neutral-400" />
+              <span>Filtros</span>
+            </button>
           </div>
 
-          <div className="card table-wrapper">
-            <div className="table-header">
-              <h3 className="section-title">Abonos Recientes</h3>
-              <a href="#" className="link-terracotta">Ver Todos</a>
+          <div className="bg-white rounded-2xl shadow-sm border border-neutral-200 overflow-hidden">
+            <div className="flex items-center justify-between p-6 border-b border-neutral-100">
+              <h3 className="text-lg font-bold text-neutral-900">Abonos Recientes</h3>
             </div>
-            <table className="payments-table">
-              <thead>
-                <tr>
-                  <th>CLIENTE / LOTE</th>
-                  <th>MONTO</th>
-                  <th>FECHA</th>
-                  <th>MÉTODO</th>
-                  <th>ESTADO</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentPayments.map(payment => (
-                  <tr key={payment.id}>
-                    <td>
-                      <div className="client-lote-info">
-                        <span className="client-name">{payment.client}</span>
-                        <span className="lote-name">{payment.lot}</span>
-                      </div>
-                    </td>
-                    <td className="font-medium text-primary">{payment.amount}</td>
-                    <td>{payment.date}</td>
-                    <td>
-                      <div className="method-info">
-                        {payment.methodIcon}
-                        <span>{payment.method}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <span className={`status-pill pill-${payment.status.toLowerCase()}`}>
-                        {payment.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <div className="table-footer">
-              <span className="showing-text">Mostrando 1 a 4 de 42 abonos</span>
-              <div className="pagination">
-                <button className="page-btn">&lt;</button>
-                <button className="page-btn">&gt;</button>
+            
+            {loading ? (
+              <div className="p-8 text-center text-neutral-500">Cargando abonos...</div>
+            ) : !(abonos?.length > 0) ? (
+              <div className="flex flex-col items-center justify-center py-16 text-neutral-400">
+                <Banknote size={48} className="mb-4 opacity-20" />
+                <p className="font-medium text-neutral-600">No hay abonos registrados</p>
+                <p className="text-sm mt-1">Registra un nuevo abono para verlo aquí.</p>
               </div>
-            </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-neutral-50/80 border-b border-neutral-200">
+                      <th className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Abono</th>
+                      <th className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Fecha</th>
+                      <th className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Monto</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-neutral-100">
+                    {(abonos || []).map(abono => (
+                      <tr key={abono.id} className="hover:bg-neutral-50 transition-colors">
+                        <td className="px-6 py-4 font-semibold text-neutral-900">
+                          Abono {String(abono.numero_abono || 1).padStart(2, '0')}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-neutral-600">
+                          {new Date(abono.fecha_pago).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4 font-semibold text-emerald-600">
+                          ${abono.monto_pagado.toLocaleString(undefined, {minimumFractionDigits: 2})} {abono.moneda || 'MXN'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            {!loading && (abonos?.length || 0) > 0 && (
+              <div className="flex items-center justify-between px-6 py-4 border-t border-neutral-100 bg-neutral-50/50">
+                <span className="text-sm text-neutral-500">Mostrando {(abonos || []).length} abonos</span>
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="payments-sidebar">
-          <div className="card overdue-card">
-            <div className="overdue-header">
+        <div className="xl:col-span-1">
+          <div className="bg-white rounded-2xl shadow-sm border border-neutral-200 flex flex-col h-full">
+            <div className="p-6 border-b border-neutral-100">
               <div className="flex items-center gap-2 mb-1">
-                <AlertTriangle size={18} className="text-alert" />
-                <h3 className="section-title mb-0">Adeudos Vencidos</h3>
+                <AlertTriangle size={18} className="text-red-500" />
+                <h3 className="text-lg font-bold text-neutral-900">Adeudos Vencidos</h3>
               </div>
-              <p className="overdue-subtitle">Atención requerida para clientes en mora.</p>
+              <p className="text-sm text-neutral-500">Atención requerida para clientes en mora.</p>
             </div>
             
-            <div className="overdue-list">
-              {overdueDebts.map(debt => (
-                <div key={debt.id} className="overdue-item">
-                  <div className="overdue-item-header">
-                    <div className="overdue-client-info">
-                      <span className="client-name">{debt.client}</span>
-                      <span className="lote-name">{debt.lot}</span>
-                    </div>
-                    <span className="days-badge">{debt.days} dias</span>
-                  </div>
-                  <div className="overdue-item-body">
-                    <div className="debt-details">
-                      <span className="debt-type">{debt.type}</span>
-                      <span className="debt-amount">{debt.amount}</span>
-                    </div>
-                    <a href="#" className="link-action">{debt.action}</a>
-                  </div>
+            <div className="p-6 flex-1 flex flex-col">
+              {loading ? (
+                <div className="py-10 text-center text-neutral-500">Cargando...</div>
+              ) : !(morosos?.length > 0) ? (
+                 <div className="flex-1 flex flex-col items-center justify-center py-10 text-neutral-400">
+                  <CheckCircle2 size={48} className="mb-4 opacity-20 text-emerald-500" />
+                  <p className="font-medium text-neutral-600">Todo al corriente</p>
+                  <p className="text-sm text-center mt-1">No hay adeudos vencidos en este momento.</p>
                 </div>
-              ))}
+              ) : (
+                <div className="flex flex-col gap-4">
+                  {(morosos || []).map(debt => (
+                    <div key={debt.id} className="p-4 rounded-xl border border-red-100 bg-red-50/30">
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-neutral-900">{debt.nombre_completo}</span>
+                          <span className="text-xs text-neutral-500">Lote {debt.terreno_clave}</span>
+                        </div>
+                        <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded-md">{debt.dias_retraso} días</span>
+                      </div>
+                      <div className="flex justify-between items-end mt-4">
+                        <div className="flex flex-col">
+                          <span className="text-[10px] uppercase font-bold text-neutral-400">P. {debt.numero_periodo}</span>
+                          <span className="font-bold text-red-600">
+                            ${debt.monto_esperado.toLocaleString(undefined, {minimumFractionDigits: 2})}
+                          </span>
+                        </div>
+                        <button className="text-sm font-medium text-orange-600 hover:text-orange-700 transition-colors">Ver</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-            
-            <button className="btn-secondary w-full mt-4">Ver Reporte Completo de Mora</button>
           </div>
         </div>
-      </div>
-    </main>
+        </div>
+        
+        {isModalOpen && (
+          <ErrorBoundary>
+            <NewPaymentModal 
+              onClose={() => setIsModalOpen(false)} 
+              onSuccess={handleSuccess} 
+            />
+          </ErrorBoundary>
+        )}
+      </main>
+    </ErrorBoundary>
   );
 };
 

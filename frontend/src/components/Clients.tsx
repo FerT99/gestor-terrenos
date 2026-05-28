@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, ArrowUpDown, UserPlus, FolderOpen, Mail, Phone, ChevronLeft, ChevronRight, Loader2, Edit2, Trash2 } from 'lucide-react';
+import { Filter, ArrowUpDown, UserPlus, Mail, Phone, Loader2, Edit2, Trash2 } from 'lucide-react';
 import { api, type Cliente, type ClienteInput } from '../lib/api';
 import ClienteModal from './ClienteModal';
 
-const Clients = () => {
+interface ClientsProps {
+  searchQuery?: string;
+  onSelectCliente?: (id: string) => void;
+}
+
+const Clients: React.FC<ClientsProps> = ({ searchQuery = '', onSelectCliente }) => {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -76,15 +81,7 @@ const Clients = () => {
         </button>
       </div>
 
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 bg-white p-4 rounded-2xl shadow-sm border border-neutral-100">
-        <div className="relative flex-1 max-w-md">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
-          <input
-            type="text"
-            placeholder="Buscar clientes por nombre o email..."
-            className="w-full pl-10 pr-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
-          />
-        </div>
+      <div className="flex flex-col md:flex-row md:items-center justify-end gap-4 mb-6 bg-white p-4 rounded-2xl shadow-sm border border-neutral-100">
         <div className="flex items-center gap-3">
           <button className="flex items-center gap-2 px-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm font-medium text-neutral-700 hover:bg-neutral-100 transition-colors">
             <Filter size={16} className="text-neutral-500" />
@@ -116,9 +113,18 @@ const Clients = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {clientes.map(client => (
-            <div key={client.id} className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-200 hover:shadow-md transition-shadow group relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+          {clientes.filter(c => {
+            const q = searchQuery.toLowerCase();
+            return !q || c.nombre_completo.toLowerCase().includes(q) || 
+                   (c.email && c.email.toLowerCase().includes(q)) || 
+                   (c.telefono && c.telefono.toLowerCase().includes(q));
+          }).map(client => (
+            <div 
+              key={client.id} 
+              className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-200 hover:shadow-md transition-shadow group relative overflow-hidden cursor-pointer"
+              onClick={() => onSelectCliente?.(client.id)}
+            >
+              <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2" onClick={(e) => e.stopPropagation()}>
                 <button 
                   onClick={() => openEditModal(client)}
                   className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors tooltip-trigger" 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Loader2 } from 'lucide-react';
-import type { Terreno, TerrenoInput } from '../lib/api';
+import type { Terreno, TerrenoInput, Cliente, Usuario } from '../lib/api';
+import { api } from '../lib/api';
 
 interface TerrenoModalProps {
   isOpen: boolean;
@@ -19,12 +20,37 @@ const EMPTY_FORM: TerrenoInput = {
   estado: 'disponible',
   coordenadas: '',
   notas: '',
+  vendedor_id: '',
+  moneda: 'MXN',
 };
 
 const TerrenoModal: React.FC<TerrenoModalProps> = ({ isOpen, onClose, onSubmit, terreno }) => {
   const [form, setForm] = useState<TerrenoInput>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [vendedores, setVendedores] = useState<Usuario[]>([]);
+  const isAdmin = localStorage.getItem('user_role') === 'admin';
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [clientesData, usuariosData] = await Promise.all([
+          api.clientes.getAll(),
+          isAdmin ? api.usuarios.getAll() : Promise.resolve([])
+        ]);
+        setClientes(clientesData || []);
+        if (isAdmin) {
+          setVendedores((usuariosData || []).filter(u => u.rol === 'vendedor'));
+        }
+      } catch (err) {
+        console.error('Error al cargar datos:', err);
+      }
+    };
+    if (isOpen) {
+      fetchData();
+    }
+  }, [isOpen, isAdmin]);
 
   const isEditing = !!terreno;
 
@@ -40,6 +66,8 @@ const TerrenoModal: React.FC<TerrenoModalProps> = ({ isOpen, onClose, onSubmit, 
         estado: terreno.estado,
         coordenadas: terreno.coordenadas ?? '',
         notas: terreno.notas ?? '',
+        vendedor_id: terreno.vendedor_id ?? '',
+        moneda: 'MXN', // Agregamos el campo moneda que es requerido
       });
     } else {
       setForm(EMPTY_FORM);
@@ -59,7 +87,7 @@ const TerrenoModal: React.FC<TerrenoModalProps> = ({ isOpen, onClose, onSubmit, 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.clave.trim()) { setError('La clave es requerida'); return; }
+    if (isEditing && !form.clave.trim()) { setError('La clave es requerida'); return; }
     if (form.superficie_m2 <= 0) { setError('La superficie debe ser mayor a 0'); return; }
     if (form.precio_lista <= 0) { setError('El precio debe ser mayor a 0'); return; }
 
@@ -99,33 +127,17 @@ const TerrenoModal: React.FC<TerrenoModalProps> = ({ isOpen, onClose, onSubmit, 
 
         <form className="p-6 overflow-y-auto max-h-[calc(100vh-10rem)]" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
-            <div className="space-y-1.5">
-              <label htmlFor="clave" className="text-sm font-medium text-neutral-700">Clave <span className="text-red-500">*</span></label>
-              <input 
-                id="clave" name="clave" type="text" placeholder="Ej. SL-045" 
-                value={form.clave} onChange={handleChange} 
-                className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label htmlFor="nombre" className="text-sm font-medium text-neutral-700">Nombre</label>
-              <input 
-                id="nombre" name="nombre" type="text" placeholder="Ej. Lote Norte A" 
-                value={form.nombre} onChange={handleChange} 
-                className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
-            <div className="space-y-1.5">
-              <label htmlFor="fase" className="text-sm font-medium text-neutral-700">Fase / Sección</label>
-              <input 
-                id="fase" name="fase" type="text" placeholder="Ej. Fase 1" 
-                value={form.fase} onChange={handleChange} 
-                className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
-              />
-            </div>
+            {isEditing && (
+              <div className="space-y-1.5">
+                <label htmlFor="clave" className="text-sm font-medium text-neutral-700">Clave <span className="text-red-500">*</span></label>
+                <input 
+                  id="clave" name="clave" type="text" placeholder="Ej. SL-045" 
+                  value={form.clave} onChange={handleChange} 
+                  disabled={true}
+                  className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all disabled:opacity-70 disabled:bg-neutral-200"
+                />
+              </div>
+            )}
             <div className="space-y-1.5">
               <label htmlFor="estado" className="text-sm font-medium text-neutral-700">Estado <span className="text-red-500">*</span></label>
               <select 
@@ -160,21 +172,37 @@ const TerrenoModal: React.FC<TerrenoModalProps> = ({ isOpen, onClose, onSubmit, 
 
           <div className="space-y-1.5 mb-5">
             <label htmlFor="propietario" className="text-sm font-medium text-neutral-700">Propietario / Cliente asignado</label>
-            <input 
-              id="propietario" name="propietario" type="text" placeholder="Nombre del propietario (opcional)"
-              value={form.propietario} onChange={handleChange} 
+            <select 
+              id="propietario" name="propietario" 
+              value={form.propietario || ''} onChange={handleChange} 
               className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
-            />
+            >
+              <option value="">Sin asignar (Opcional)</option>
+              {clientes.map(c => (
+                <option key={c.id} value={c.nombre_completo}>
+                  {c.nombre_completo}
+                </option>
+              ))}
+            </select>
           </div>
 
-          <div className="space-y-1.5 mb-5">
-            <label htmlFor="coordenadas" className="text-sm font-medium text-neutral-700">Coordenadas</label>
-            <input 
-              id="coordenadas" name="coordenadas" type="text" placeholder="Ej. 21.1619,-86.8515 (opcional)"
-              value={form.coordenadas} onChange={handleChange} 
-              className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
-            />
-          </div>
+          {isAdmin && (
+            <div className="space-y-1.5 mb-5">
+              <label htmlFor="vendedor_id" className="text-sm font-medium text-neutral-700">Asesor Asignado</label>
+              <select 
+                id="vendedor_id" name="vendedor_id" 
+                value={form.vendedor_id || ''} onChange={handleChange} 
+                className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+              >
+                <option value="">Sin asignar (Visible para todos los admins)</option>
+                {vendedores.map(v => (
+                  <option key={v.id} value={v.id}>
+                    {v.nombre_completo}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div className="space-y-1.5 mb-6">
             <label htmlFor="notas" className="text-sm font-medium text-neutral-700">Notas</label>
