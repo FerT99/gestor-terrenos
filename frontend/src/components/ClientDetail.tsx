@@ -77,7 +77,7 @@ const ClientDetail: React.FC<ClientDetailProps> = ({ clienteId, onBack }) => {
   const lotesAsignados = planes.map(plan => {
     const terreno = terrenos.find(t => t.id === plan.terreno_id);
     return { plan, terreno };
-  });
+  }).filter(({ terreno }) => terreno && terreno.estado !== 'disponible');
 
   return (
     <div className="p-6 md:p-10 max-w-5xl mx-auto min-h-[calc(100vh-4rem)]">
@@ -173,7 +173,7 @@ const ClientDetail: React.FC<ClientDetailProps> = ({ clienteId, onBack }) => {
                   <span className="inline-block px-2 py-1 bg-orange-100 text-orange-700 text-xs font-bold rounded mb-2">
                     LOTE {terreno?.clave || plan.terreno_nombre || 'Desconocido'}
                   </span>
-                  <h3 className="text-lg font-bold text-neutral-900">{terreno?.nombre || 'Sin nombre asignado'}</h3>
+                  {terreno?.nombre && <h3 className="text-lg font-bold text-neutral-900">{terreno.nombre}</h3>}
                 </div>
                 <div className="text-right">
                   <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${

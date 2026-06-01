@@ -7,7 +7,8 @@ import {
   Calendar, 
   Filter, 
   Banknote,
-  CheckCircle2
+  CheckCircle2,
+  FileText
 } from 'lucide-react';
 import { api, type Abono, type ClienteMoroso } from '../lib/api';
 import NewPaymentModal from './NewPaymentModal';
@@ -139,8 +140,10 @@ const Payments = () => {
                   <thead>
                     <tr className="bg-neutral-50/80 border-b border-neutral-200">
                       <th className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Abono</th>
+                      <th className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Terreno</th>
                       <th className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Fecha</th>
                       <th className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Monto</th>
+                      <th className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider text-right">Comprobante</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-neutral-100">
@@ -150,10 +153,37 @@ const Payments = () => {
                           Abono {String(abono.numero_abono || 1).padStart(2, '0')}
                         </td>
                         <td className="px-6 py-4 text-sm text-neutral-600">
+                          <div className="flex flex-col">
+                            <span className="font-semibold text-neutral-800">
+                              Lote {abono.terreno_clave || '---'}
+                            </span>
+                            {abono.cliente_nombre && (
+                              <span className="text-xs text-neutral-400">
+                                {abono.cliente_nombre}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-neutral-600">
                           {new Date(abono.fecha_pago).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-4 font-semibold text-emerald-600">
                           ${abono.monto_pagado.toLocaleString(undefined, {minimumFractionDigits: 2})} {abono.moneda || 'MXN'}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          {abono.comprobante_url ? (
+                            <a 
+                              href={abono.comprobante_url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center justify-center p-2 text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors"
+                              title="Ver comprobante"
+                            >
+                              <FileText size={18} />
+                            </a>
+                          ) : (
+                            <span className="text-neutral-300 text-sm">-</span>
+                          )}
                         </td>
                       </tr>
                     ))}

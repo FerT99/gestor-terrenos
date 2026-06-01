@@ -91,6 +91,11 @@ const TerrenoModal: React.FC<TerrenoModalProps> = ({ isOpen, onClose, onSubmit, 
     if (form.superficie_m2 <= 0) { setError('La superficie debe ser mayor a 0'); return; }
     if (form.precio_lista <= 0) { setError('El precio debe ser mayor a 0'); return; }
 
+    if (form.estado === 'disponible' && form.propietario && form.propietario.trim() !== '') {
+      setError('No se puede poner disponible un terreno con un cliente asignado.');
+      return;
+    }
+
     setSaving(true);
     setError(null);
     try {

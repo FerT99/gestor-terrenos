@@ -8,15 +8,31 @@ interface SummaryCardProps {
   trend?: string;
   trendUp?: boolean;
   isAlert?: boolean;
+  variant?: 'orange' | 'green' | 'red';
 }
 
 const SummaryCard: React.FC<SummaryCardProps> = ({ 
-  title, value, subtitle, icon, trend, trendUp, isAlert 
+  title, value, subtitle, icon, trend, trendUp, isAlert, variant = 'orange'
 }) => {
+  const isRed = isAlert || variant === 'red';
+  const isGreen = variant === 'green';
+
+  let cardClass = 'border-neutral-200';
+  if (isRed) {
+    cardClass = 'border-red-200 bg-red-50';
+  }
+
+  let iconClass = 'bg-orange-100 text-orange-600';
+  if (isRed) {
+    iconClass = 'bg-red-100 text-red-600';
+  } else if (isGreen) {
+    iconClass = 'bg-emerald-100 text-emerald-600';
+  }
+
   return (
-    <div className={`bg-white rounded-2xl p-6 shadow-sm border ${isAlert ? 'border-red-200 bg-red-50' : 'border-neutral-200'}`}>
+    <div className={`bg-white rounded-2xl p-6 shadow-sm border ${cardClass}`}>
       <div className="flex justify-between items-start mb-4">
-        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isAlert ? 'bg-red-100 text-red-600' : 'bg-orange-100 text-orange-600'}`}>
+        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${iconClass}`}>
           {icon}
         </div>
         {trend && (
@@ -27,9 +43,9 @@ const SummaryCard: React.FC<SummaryCardProps> = ({
       </div>
       
       <div className="flex flex-col">
-        <span className={`text-sm font-medium mb-1 ${isAlert ? 'text-red-600/80' : 'text-neutral-500'}`}>{title}</span>
-        <span className={`text-2xl font-bold ${isAlert ? 'text-red-600' : 'text-neutral-900'}`}>{value}</span>
-        <span className={`text-xs mt-2 ${isAlert ? 'text-red-500 font-medium' : 'text-neutral-400'}`}>{subtitle}</span>
+        <span className={`text-sm font-medium mb-1 ${isRed ? 'text-red-600/80' : 'text-neutral-500'}`}>{title}</span>
+        <span className={`text-2xl font-bold ${isRed ? 'text-red-600' : 'text-neutral-900'}`}>{value}</span>
+        <span className={`text-xs mt-2 ${isRed ? 'text-red-500 font-medium' : 'text-neutral-400'}`}>{subtitle}</span>
       </div>
     </div>
   );

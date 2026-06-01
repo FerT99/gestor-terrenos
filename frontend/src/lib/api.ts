@@ -134,7 +134,11 @@ export interface Abono {
   notas: string | null;
   moneda: string;
   created_at: string;
+  terreno_clave?: string;
+  terreno_nombre?: string;
+  cliente_nombre?: string;
 }
+
 
 export interface AbonoInput {
   periodo_pago_id: string;
@@ -144,6 +148,7 @@ export interface AbonoInput {
   notas: string;
   perdonar_mora: boolean;
   moneda: string;
+  comprobante_url?: string;
 }
 
 export interface ClienteMoroso {
@@ -368,6 +373,25 @@ export const api = {
       if (!res.ok) throw new Error('Error al obtener abonos');
       const json = await res.json();
       return json.data as Abono[];
+    },
+    uploadComprobante: async (file: File): Promise<string> => {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { data, error } = await supabase.storage
+        .from('comprobantes')
+        .upload(filePath, file);
+
+      if (error) {
+        throw new Error(`Error subiendo archivo: ${error.message}`);
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from('comprobantes')
+        .getPublicUrl(filePath);
+
+      return publicUrlData.publicUrl;
     }
   },
 
@@ -402,6 +426,20 @@ export const api = {
       const headers = await getAuthHeaders();
       const res = await fetch(`${API_URL}/api/v1/usuarios/me`, { headers });
       if (!res.ok) throw new Error('Error al obtener perfil de usuario');
+      const json = await res.json();
+      return json.data as Usuario;
+    },
+    createVendedor: async (input: any): Promise<Usuario> => {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_URL}/api/v1/usuarios/vendedores`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(input)
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message ?? 'Error al crear vendedor');
+      }
       const json = await res.json();
       return json.data as Usuario;
     }

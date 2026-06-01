@@ -14,6 +14,8 @@ const Clients: React.FC<ClientsProps> = ({ searchQuery = '', onSelectCliente }) 
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [clientToEdit, setClientToEdit] = useState<Cliente | null>(null);
+  const [morososIds, setMorososIds] = useState<Set<string>>(new Set());
+  const [clientLotesCount, setClientLotesCount] = useState<Record<string, number>>({});
 
   useEffect(() => {
     fetchClientes();
@@ -22,8 +24,21 @@ const Clients: React.FC<ClientsProps> = ({ searchQuery = '', onSelectCliente }) 
   const fetchClientes = async () => {
     try {
       setLoading(true);
-      const data = await api.clientes.getAll();
-      setClientes(data);
+      const [clientesData, morososData, planesData] = await Promise.all([
+        api.clientes.getAll(),
+        api.reportes.getMorosos(),
+        api.planesPago.getAll()
+      ]);
+      setClientes(clientesData);
+
+      const morososSet = new Set((morososData || []).map(m => m.id));
+      setMorososIds(morososSet);
+
+      const lotesMap: Record<string, number> = {};
+      (planesData || []).forEach(p => {
+        lotesMap[p.cliente_id] = (lotesMap[p.cliente_id] || 0) + 1;
+      });
+      setClientLotesCount(lotesMap);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al cargar clientes');
     } finally {
@@ -81,18 +96,7 @@ const Clients: React.FC<ClientsProps> = ({ searchQuery = '', onSelectCliente }) 
         </button>
       </div>
 
-      <div className="flex flex-col md:flex-row md:items-center justify-end gap-4 mb-6 bg-white p-4 rounded-2xl shadow-sm border border-neutral-100">
-        <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm font-medium text-neutral-700 hover:bg-neutral-100 transition-colors">
-            <Filter size={16} className="text-neutral-500" />
-            <span>Filtros</span>
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm font-medium text-neutral-700 hover:bg-neutral-100 transition-colors">
-            <ArrowUpDown size={16} className="text-neutral-500" />
-            <span>Ordenar</span>
-          </button>
-        </div>
-      </div>
+
 
       {error && (
         <div className="mb-6 p-4 bg-red-50 text-red-700 border border-red-200 rounded-xl">
@@ -118,12 +122,16 @@ const Clients: React.FC<ClientsProps> = ({ searchQuery = '', onSelectCliente }) 
             return !q || c.nombre_completo.toLowerCase().includes(q) || 
                    (c.email && c.email.toLowerCase().includes(q)) || 
                    (c.telefono && c.telefono.toLowerCase().includes(q));
-          }).map(client => (
-            <div 
-              key={client.id} 
-              className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-200 hover:shadow-md transition-shadow group relative overflow-hidden cursor-pointer"
-              onClick={() => onSelectCliente?.(client.id)}
-            >
+          }).map(client => {
+            const isMoroso = morososIds.has(client.id);
+            return (
+              <div 
+                key={client.id} 
+                className={`bg-white rounded-2xl p-6 shadow-sm border hover:shadow-md transition-shadow group relative overflow-hidden cursor-pointer ${
+                  isMoroso ? 'border-red-300 bg-red-50/20' : 'border-neutral-200'
+                }`}
+                onClick={() => onSelectCliente?.(client.id)}
+              >
               <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2" onClick={(e) => e.stopPropagation()}>
                 <button 
                   onClick={() => openEditModal(client)}
@@ -164,7 +172,9 @@ const Clients: React.FC<ClientsProps> = ({ searchQuery = '', onSelectCliente }) 
               <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-xl border border-neutral-100">
                 <div className="flex flex-col">
                   <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1">Lotes Asignados</span>
-                  <span className="text-lg font-bold text-neutral-800">0</span>
+                  <span className="text-lg font-bold text-neutral-800">
+                    {clientLotesCount[client.id] || 0}
+                  </span>
                 </div>
 
                 <div className="flex flex-col items-end">
@@ -178,8 +188,9 @@ const Clients: React.FC<ClientsProps> = ({ searchQuery = '', onSelectCliente }) 
                   </span>
                 </div>
               </div>
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </div>
       )}
 

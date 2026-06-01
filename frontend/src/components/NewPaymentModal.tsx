@@ -16,6 +16,7 @@ const NewPaymentModal: React.FC<NewPaymentModalProps> = ({ onClose, onSuccess })
   const [montoPagado, setMontoPagado] = useState<number | ''>('');
   const [moneda, setMoneda] = useState('MXN');
   const [fechaPago, setFechaPago] = useState(new Date().toISOString().split('T')[0]);
+  const [comprobanteFile, setComprobanteFile] = useState<File | null>(null);
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -86,6 +87,11 @@ const NewPaymentModal: React.FC<NewPaymentModalProps> = ({ onClose, onSuccess })
     setError('');
 
     try {
+      let comprobante_url = '';
+      if (comprobanteFile) {
+        comprobante_url = await api.abonos.uploadComprobante(comprobanteFile);
+      }
+
       await api.abonos.create({
         periodo_pago_id: selectedPeriodoId,
         monto_pagado: Number(montoPagado),
@@ -94,6 +100,7 @@ const NewPaymentModal: React.FC<NewPaymentModalProps> = ({ onClose, onSuccess })
         notas: '',
         perdonar_mora: false,
         moneda: moneda,
+        comprobante_url: comprobante_url || undefined,
       });
       onSuccess();
     } catch (err: any) {
@@ -179,6 +186,20 @@ const NewPaymentModal: React.FC<NewPaymentModalProps> = ({ onClose, onSuccess })
                 <option value="MXN">MXN - Pesos Mexicanos</option>
                 <option value="USD">USD - Dólares</option>
               </select>
+            </div>
+            
+            <div className="md:col-span-2 space-y-1.5">
+              <label className="text-sm font-semibold text-neutral-700">Comprobante de Pago (Opcional)</label>
+              <input 
+                type="file"
+                accept="image/*,.pdf"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    setComprobanteFile(e.target.files[0]);
+                  }
+                }}
+                className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-neutral-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
+              />
             </div>
           </div>
         </form>

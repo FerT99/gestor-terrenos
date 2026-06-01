@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Bell, User, DownloadCloud } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 interface HeaderProps {
   currentView?: string;
@@ -32,11 +32,6 @@ const Header: React.FC<HeaderProps> = ({ currentView = 'dashboard', searchQuery 
   return (
     <header className="h-16 bg-white border-b border-neutral-200 flex items-center justify-between px-6 z-10 sticky top-0">
       <div className="flex items-center gap-8">
-        <nav className="hidden md:flex items-center gap-1">
-          <button className="px-4 py-2 text-sm font-semibold text-orange-600 bg-orange-50 rounded-lg">Visión General</button>
-          {/* <button className="px-4 py-2 text-sm font-medium text-neutral-500 hover:text-neutral-800 hover:bg-neutral-50 rounded-lg transition-colors">Mapa</button>
-          <button className="px-4 py-2 text-sm font-medium text-neutral-500 hover:text-neutral-800 hover:bg-neutral-50 rounded-lg transition-colors">Analíticas</button> */}
-        </nav>
       </div>
 
       <div className="flex items-center gap-4">
@@ -53,23 +48,7 @@ const Header: React.FC<HeaderProps> = ({ currentView = 'dashboard', searchQuery 
             />
           </div>
         )}
-        
-        {showSearch && <div className="h-6 w-px bg-neutral-200 hidden sm:block mx-1"></div>}
 
-        <button className="hidden sm:flex items-center gap-2 text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors">
-          <DownloadCloud size={18} />
-          <span>Exportar</span>
-        </button>
-
-        <div className="flex items-center gap-2 ml-2">
-          <button className="relative p-2 text-neutral-400 hover:text-orange-600 hover:bg-orange-50 rounded-full transition-colors">
-            <Bell size={20} />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 border-2 border-white rounded-full"></span>
-          </button>
-          <button className="p-2 text-neutral-400 hover:text-orange-600 hover:bg-orange-50 rounded-full transition-colors">
-            <User size={20} />
-          </button>
-        </div>
       </div>
     </header>
   );
