@@ -8,7 +8,7 @@ import {
   Banknote,
   FileText
 } from 'lucide-react';
-import { api, type Abono, type ClienteMoroso, type Terreno, type PlanPago } from '../lib/api';
+import { api, type Abono, type Terreno, type PlanPago } from '../lib/api';
 import NewPaymentModal from './NewPaymentModal';
 import ErrorBoundary from './ErrorBoundary';
 
@@ -18,7 +18,7 @@ interface PaymentsProps {
 
 const Payments: React.FC<PaymentsProps> = ({ onViewMorosos }) => {
   const [abonos, setAbonos] = useState<Abono[]>([]);
-  const [morosos, setMorosos] = useState<ClienteMoroso[]>([]);
+
   const [terrenos, setTerrenos] = useState<Terreno[]>([]);
   const [planes, setPlanes] = useState<PlanPago[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,14 +26,12 @@ const Payments: React.FC<PaymentsProps> = ({ onViewMorosos }) => {
 
   const fetchData = async () => {
     try {
-      const [abonosData, morososData, terrenosData, planesData] = await Promise.all([
+      const [abonosData, terrenosData, planesData] = await Promise.all([
         api.abonos.getAll(),
-        api.reportes.getMorosos(),
         api.terrenos.getAll(),
         api.planesPago.getAll()
       ]);
       setAbonos(abonosData || []);
-      setMorosos(morososData || []);
       setTerrenos(terrenosData || []);
       setPlanes(planesData || []);
     } catch (err) {
