@@ -114,24 +114,12 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView, onLogout
         </button>
 
         <div className="space-y-1 mb-4">
-          <a href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900 font-medium transition-colors">
-            <HelpCircle size={18} className="text-neutral-400" />
-            <span className="text-sm">Soporte</span>
-          </a>
           <a href="#" onClick={(e) => { e.preventDefault(); if (onLogout) onLogout(); }} className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-neutral-500 hover:bg-red-50 hover:text-red-600 font-medium transition-colors group">
             <LogOut size={18} className="text-neutral-400 group-hover:text-red-500" />
             <span className="text-sm">Cerrar Sesión</span>
           </a>
         </div>
 
-        {/* User Profile */}
-        <div className="flex items-center gap-3 px-4 py-3 bg-neutral-50 rounded-xl border border-neutral-200/60">
-          <img src="https://i.pravatar.cc/150?img=11" alt="User Profile" className="w-9 h-9 rounded-full object-cover ring-2 ring-white shadow-sm" />
-          <div className="flex flex-col">
-            <span className="text-sm font-bold text-neutral-900">Usuario</span>
-            <span className="text-xs font-medium text-neutral-500 capitalize">{userRole}</span>
-          </div>
-        </div>
       </div>
     </aside>
   );

@@ -5,11 +5,12 @@ import { api, type PlanPago, type PeriodoPago } from '../lib/api';
 interface NewPaymentModalProps {
   onClose: () => void;
   onSuccess: () => void;
+  initialPlanId?: string;
 }
 
-const NewPaymentModal: React.FC<NewPaymentModalProps> = ({ onClose, onSuccess }) => {
+const NewPaymentModal: React.FC<NewPaymentModalProps> = ({ onClose, onSuccess, initialPlanId }) => {
   const [planes, setPlanes] = useState<PlanPago[]>([]);
-  const [selectedPlanId, setSelectedPlanId] = useState<string>('');
+  const [selectedPlanId, setSelectedPlanId] = useState<string>(initialPlanId || '');
   const [periodos, setPeriodos] = useState<PeriodoPago[]>([]);
   const [selectedPeriodoId, setSelectedPeriodoId] = useState<string>('');
   
@@ -17,6 +18,7 @@ const NewPaymentModal: React.FC<NewPaymentModalProps> = ({ onClose, onSuccess })
   const [moneda, setMoneda] = useState('MXN');
   const [fechaPago, setFechaPago] = useState(new Date().toISOString().split('T')[0]);
   const [comprobanteFile, setComprobanteFile] = useState<File | null>(null);
+  const [perdonarMora, setPerdonarMora] = useState(false);
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -98,7 +100,7 @@ const NewPaymentModal: React.FC<NewPaymentModalProps> = ({ onClose, onSuccess })
         fecha_pago: fechaPago,
         metodo_pago: 'Transferencia',
         notas: '',
-        perdonar_mora: false,
+        perdonar_mora: perdonarMora,
         moneda: moneda,
         comprobante_url: comprobante_url || undefined,
       });
@@ -172,7 +174,7 @@ const NewPaymentModal: React.FC<NewPaymentModalProps> = ({ onClose, onSuccess })
                 min="0.01"
                 step="0.01"
                 value={montoPagado}
-                onChange={(e) => setMontoPagado(Number(e.target.value))}
+                onChange={(e) => setMontoPagado(e.target.value === '' ? '' : Number(e.target.value))}
                 className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-neutral-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all"
               />
             </div>
@@ -200,6 +202,19 @@ const NewPaymentModal: React.FC<NewPaymentModalProps> = ({ onClose, onSuccess })
                 }}
                 className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-neutral-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
               />
+            </div>
+            
+            <div className="md:col-span-2 flex items-center gap-2 mt-2">
+              <input 
+                type="checkbox" 
+                id="perdonarMora"
+                checked={perdonarMora}
+                onChange={(e) => setPerdonarMora(e.target.checked)}
+                className="w-4 h-4 text-orange-600 rounded border-neutral-300 focus:ring-orange-500"
+              />
+              <label htmlFor="perdonarMora" className="text-sm font-medium text-neutral-700 cursor-pointer">
+                Perdonar mora (si el pago está atrasado, no se cobrará el recargo)
+              </label>
             </div>
           </div>
         </form>

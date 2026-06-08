@@ -97,7 +97,6 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               <input type="checkbox" id="remember-me" />
               <span>Recordarme</span>
             </label>
-            <a href="#" className="forgot-password">¿Olvidaste tu contraseña?</a>
           </div>
 
           <button
@@ -109,9 +108,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           </button>
         </form>
 
-        <div className="login-footer">
-          <p>¿Necesitas ayuda? <a href="#">Contacta al soporte.</a></p>
-        </div>
+
       </div>
     </div>
   );

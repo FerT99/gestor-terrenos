@@ -55,7 +55,7 @@ const OverdueClients = () => {
                 </div>
                 
                 <div className="text-right">
-                  <p className="text-sm font-bold text-red-600">${client.monto_esperado.toLocaleString(undefined, {minimumFractionDigits: 2})}</p>
+                  <p className="text-sm font-bold text-red-600">Periodo {client.numero_periodo}</p>
                   <p className="text-[10px] font-bold uppercase text-red-500/70">{client.dias_retraso} días tarde</p>
                 </div>
               </div>

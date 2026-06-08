@@ -5,9 +5,10 @@ import { api, type Cliente, type PlanPago, type Terreno } from '../lib/api';
 interface ClientDetailProps {
   clienteId: string;
   onBack: () => void;
+  onViewTerreno?: (terrenoId: string) => void;
 }
 
-const ClientDetail: React.FC<ClientDetailProps> = ({ clienteId, onBack }) => {
+const ClientDetail: React.FC<ClientDetailProps> = ({ clienteId, onBack, onViewTerreno }) => {
   const [cliente, setCliente] = useState<Cliente | null>(null);
   const [planes, setPlanes] = useState<PlanPago[]>([]);
   const [terrenos, setTerrenos] = useState<Terreno[]>([]);
@@ -167,7 +168,11 @@ const ClientDetail: React.FC<ClientDetailProps> = ({ clienteId, onBack }) => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {lotesAsignados.map(({ plan, terreno }) => (
-            <div key={plan.id} className="bg-white rounded-2xl shadow-sm border border-neutral-200 p-6 flex flex-col hover:shadow-md transition-shadow">
+            <div 
+              key={plan.id} 
+              onClick={() => terreno && onViewTerreno?.(terreno.id)}
+              className={`bg-white rounded-2xl shadow-sm border border-neutral-200 p-6 flex flex-col transition-shadow ${onViewTerreno && terreno ? 'cursor-pointer hover:shadow-md' : ''}`}
+            >
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <span className="inline-block px-2 py-1 bg-orange-100 text-orange-700 text-xs font-bold rounded mb-2">

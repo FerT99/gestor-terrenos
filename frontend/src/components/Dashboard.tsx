@@ -41,7 +41,7 @@ const Dashboard = () => {
   }
 
   // Calculate Lotes Vendidos
-  const lotesVendidos = terrenos.filter(t => t.estado === 'vendido').length;
+  const lotesVendidos = terrenos.filter(t => t.estado.toLowerCase() === 'vendido').length;
 
   // Calculate Ingresos of current month
   const currentMonth = new Date().getMonth();
@@ -88,7 +88,7 @@ const Dashboard = () => {
         <SummaryCard 
           title="Adeudos Vencidos" 
           value={overdueCount} 
-          subtitle={`$${totalMora.toLocaleString('es-MX', { minimumFractionDigits: 2 })} en mora`} 
+          subtitle="Pagos atrasados" 
           icon={<AlertTriangle size={18} />} 
           isAlert={overdueCount > 0} 
         />

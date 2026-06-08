@@ -79,10 +79,26 @@ const TerrenoModal: React.FC<TerrenoModalProps> = ({ isOpen, onClose, onSubmit, 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setForm(prev => ({
-      ...prev,
-      [name]: name === 'superficie_m2' || name === 'precio_lista' ? parseFloat(value) || 0 : value,
-    }));
+    setForm(prev => {
+      const updated = {
+        ...prev,
+        [name]: name === 'superficie_m2' || name === 'precio_lista' ? (value === '' ? '' as any : parseFloat(value)) : value,
+      };
+
+      if (name === 'propietario') {
+        if (value && value.trim() !== '' && prev.estado.toLowerCase() === 'disponible') {
+          updated.estado = 'vendido';
+        } else if ((!value || value.trim() === '') && prev.estado !== 'disponible') {
+          updated.estado = 'disponible';
+        }
+      }
+
+      if (name === 'estado' && value === 'disponible') {
+        updated.propietario = '';
+      }
+
+      return updated;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -91,7 +107,7 @@ const TerrenoModal: React.FC<TerrenoModalProps> = ({ isOpen, onClose, onSubmit, 
     if (form.superficie_m2 <= 0) { setError('La superficie debe ser mayor a 0'); return; }
     if (form.precio_lista <= 0) { setError('El precio debe ser mayor a 0'); return; }
 
-    if (form.estado === 'disponible' && form.propietario && form.propietario.trim() !== '') {
+    if (form.estado.toLowerCase() === 'disponible' && form.propietario && form.propietario.trim() !== '') {
       setError('No se puede poner disponible un terreno con un cliente asignado.');
       return;
     }

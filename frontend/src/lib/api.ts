@@ -392,6 +392,18 @@ export const api = {
         .getPublicUrl(filePath);
 
       return publicUrlData.publicUrl;
+    },
+    updateComprobante: async (id: string, comprobante_url: string): Promise<void> => {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_URL}/api/v1/abonos/${id}/comprobante`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify({ comprobante_url }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message ?? 'Error al actualizar comprobante');
+      }
     }
   },
 

@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, Check, Pencil, Trash2, Loader2, AlertCircle,
 import { useTerrenos } from '../hooks/useTerrenos';
 import type { Terreno, TerrenoInput } from '../lib/api';
 import TerrenoModal from './TerrenoModal';
+import ConfirmModal from './ConfirmModal';
 
 const ESTADOS = ['Todos', 'disponible', 'apartado', 'vendido'] as const;
 const PAGE_SIZE = 10;
@@ -24,10 +25,11 @@ const LandCatalog: React.FC<LandCatalogProps> = ({ searchQuery = '', onSelectTer
   const [editTerreno, setEditTerreno] = useState<Terreno | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<{isOpen: boolean, terreno: Terreno | null}>({ isOpen: false, terreno: null });
 
   // Filtrado
   const filtered = terrenos.filter(t => {
-    const matchesFilter = filter === 'Todos' || t.estado === filter;
+    const matchesFilter = filter === 'Todos' || t.estado.toLowerCase() === filter;
     const q = searchQuery.toLowerCase();
     const matchesSearch = !q || 
       t.clave.toLowerCase().includes(q) || 
@@ -55,9 +57,13 @@ const LandCatalog: React.FC<LandCatalogProps> = ({ searchQuery = '', onSelectTer
     setModalOpen(true);
   };
 
-  const handleDelete = async (t: Terreno) => {
-    const confirmed = window.confirm(`¿Eliminar el lote ${t.clave}? Esta acción no se puede deshacer.`);
-    if (!confirmed) return;
+  const handleDeleteClick = (t: Terreno) => {
+    setConfirmDelete({ isOpen: true, terreno: t });
+  };
+
+  const handleConfirmDelete = async () => {
+    const t = confirmDelete.terreno;
+    if (!t) return;
     setDeletingId(t.id);
     setActionError(null);
     try {
@@ -66,6 +72,7 @@ const LandCatalog: React.FC<LandCatalogProps> = ({ searchQuery = '', onSelectTer
       setActionError(e instanceof Error ? e.message : 'Error al eliminar');
     } finally {
       setDeletingId(null);
+      setConfirmDelete({ isOpen: false, terreno: null });
     }
   };
 
@@ -199,13 +206,13 @@ const LandCatalog: React.FC<LandCatalogProps> = ({ searchQuery = '', onSelectTer
                       )}
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${t.estado === 'vendido' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                        t.estado === 'apartado' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${t.estado.toLowerCase() === 'vendido' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                        t.estado.toLowerCase() === 'apartado' ? 'bg-amber-50 text-amber-700 border-amber-200' :
                           'bg-blue-50 text-blue-700 border-blue-200'
                         }`}>
-                        {t.estado === 'vendido'
+                        {t.estado.toLowerCase() === 'vendido'
                           ? <Check size={12} strokeWidth={3} />
-                          : <span className={`w-1.5 h-1.5 rounded-full ${t.estado === 'apartado' ? 'bg-amber-500' : 'bg-blue-500'}`}></span>
+                          : <span className={`w-1.5 h-1.5 rounded-full ${t.estado.toLowerCase() === 'apartado' ? 'bg-amber-500' : 'bg-blue-500'}`}></span>
                         }
                         {t.estado.charAt(0).toUpperCase() + t.estado.slice(1)}
                       </span>
@@ -221,7 +228,7 @@ const LandCatalog: React.FC<LandCatalogProps> = ({ searchQuery = '', onSelectTer
                         </button>
                         <button
                           className="p-2 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors tooltip-trigger"
-                          onClick={() => handleDelete(t)}
+                          onClick={() => handleDeleteClick(t)}
                           disabled={deletingId === t.id}
                           title="Eliminar lote"
                         >
@@ -270,6 +277,14 @@ const LandCatalog: React.FC<LandCatalogProps> = ({ searchQuery = '', onSelectTer
         onClose={() => setModalOpen(false)}
         onSubmit={handleModalSubmit}
         terreno={editTerreno}
+      />
+
+      <ConfirmModal
+        isOpen={confirmDelete.isOpen}
+        title="Eliminar Lote"
+        message={`¿Estás seguro de eliminar el lote ${confirmDelete.terreno?.clave}? Esta acción no se puede deshacer.`}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setConfirmDelete({ isOpen: false, terreno: null })}
       />
     </main>
   );

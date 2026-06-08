@@ -10,24 +10,34 @@ import {
   CheckCircle2,
   FileText
 } from 'lucide-react';
-import { api, type Abono, type ClienteMoroso } from '../lib/api';
+import { api, type Abono, type ClienteMoroso, type Terreno, type PlanPago } from '../lib/api';
 import NewPaymentModal from './NewPaymentModal';
 import ErrorBoundary from './ErrorBoundary';
 
-const Payments = () => {
+interface PaymentsProps {
+  onViewMorosos: () => void;
+}
+
+const Payments: React.FC<PaymentsProps> = ({ onViewMorosos }) => {
   const [abonos, setAbonos] = useState<Abono[]>([]);
   const [morosos, setMorosos] = useState<ClienteMoroso[]>([]);
+  const [terrenos, setTerrenos] = useState<Terreno[]>([]);
+  const [planes, setPlanes] = useState<PlanPago[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchData = async () => {
     try {
-      const [abonosData, morososData] = await Promise.all([
+      const [abonosData, morososData, terrenosData, planesData] = await Promise.all([
         api.abonos.getAll(),
-        api.reportes.getMorosos()
+        api.reportes.getMorosos(),
+        api.terrenos.getAll(),
+        api.planesPago.getAll()
       ]);
       setAbonos(abonosData || []);
       setMorosos(morososData || []);
+      setTerrenos(terrenosData || []);
+      setPlanes(planesData || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -47,6 +57,19 @@ const Payments = () => {
   const totalCobros = (abonos || []).reduce((acc, curr) => acc + curr.monto_pagado, 0);
   const totalMora = (morosos || []).reduce((acc, curr) => acc + curr.monto_esperado, 0);
 
+  const lotesApartados = terrenos.filter(t => t.estado.toLowerCase() === 'apartado').length;
+  const lotesAbonados = terrenos.filter(t => t.estado.toLowerCase() === 'vendido').length;
+  const valorCapital = planes.reduce((acc, curr) => acc + curr.monto_total, 0); 
+  const valorEstimadoMes = planes.reduce((acc, curr) => {
+     const montoFinanciar = curr.monto_total - curr.enganche;
+     const mensualidad = curr.plazos > 0 ? montoFinanciar / curr.plazos : 0;
+     return acc + mensualidad;
+  }, 0);
+  
+  const ingresosEfectivo = abonos.filter(a => a.metodo_pago?.toLowerCase() === 'efectivo').reduce((acc, curr) => acc + curr.monto_pagado, 0);
+  const ingresosTransferencia = abonos.filter(a => a.metodo_pago?.toLowerCase() === 'transferencia').reduce((acc, curr) => acc + curr.monto_pagado, 0);
+
+
   return (
     <ErrorBoundary>
       <main className="p-6 md:p-10 max-w-7xl mx-auto min-h-[calc(100vh-4rem)] bg-neutral-50/50">
@@ -55,61 +78,88 @@ const Payments = () => {
           <h2 className="text-3xl font-bold tracking-tight text-neutral-900">Gestión de Pagos</h2>
           <p className="text-neutral-500 mt-1">Administración de abonos, moratoria y estado de cuenta de clientes.</p>
         </div>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 bg-gradient-to-r from-orange-600 to-orange-500 text-white px-5 py-2.5 rounded-xl font-medium hover:from-orange-700 hover:to-orange-600 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-        >
-          <PlusCircle size={18} />
-          <span>Registrar Abono</span>
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button 
+            onClick={onViewMorosos}
+            className="flex items-center gap-2 bg-red-50 text-red-600 border border-red-200 px-5 py-2.5 rounded-xl font-medium hover:bg-red-100 transition-all shadow-sm"
+          >
+            <AlertTriangle size={18} />
+            <span>Ver Morosos</span>
+          </button>
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center gap-2 bg-gradient-to-r from-orange-600 to-orange-500 text-white px-5 py-2.5 rounded-xl font-medium hover:from-orange-700 hover:to-orange-600 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+          >
+            <PlusCircle size={18} />
+            <span>Registrar Abono</span>
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-200">
-          <div className="flex justify-between items-start mb-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-neutral-200 flex flex-col justify-between hover:shadow-md transition-shadow">
+          <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider mb-2">Lotes Apartados</span>
+          <span className="text-3xl font-black text-neutral-900">{lotesApartados}</span>
+        </div>
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-neutral-200 flex flex-col justify-between hover:shadow-md transition-shadow">
+          <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider mb-2">Lotes Abonados</span>
+          <span className="text-3xl font-black text-neutral-900">{lotesAbonados}</span>
+        </div>
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-neutral-200 flex flex-col justify-between hover:shadow-md transition-shadow">
+          <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider mb-2">Valor Capital</span>
+          <span className="text-2xl font-black text-emerald-600">${valorCapital.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+        </div>
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-neutral-200 flex flex-col justify-between hover:shadow-md transition-shadow">
+          <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider mb-2">Pagos Efectuados</span>
+          <span className="text-2xl font-black text-emerald-600">${totalCobros.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="bg-orange-50 rounded-2xl p-6 shadow-sm border border-orange-100 hover:shadow-md transition-shadow relative overflow-hidden">
+          <div className="absolute -right-4 -top-4 opacity-10">
+            <Calendar size={100} />
+          </div>
+          <div className="flex justify-between items-start mb-4 relative z-10">
             <div className="w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center">
+              <Calendar size={20} />
+            </div>
+            <span className="text-xs font-bold text-orange-600 bg-orange-100 px-3 py-1 rounded-full uppercase tracking-wide">Mensualidad</span>
+          </div>
+          <div className="flex flex-col relative z-10">
+            <span className="text-sm font-semibold text-orange-700/80 mb-1">Valor Estimado por Mes</span>
+            <span className="text-3xl font-black text-orange-600">
+              ${valorEstimadoMes.toLocaleString(undefined, {minimumFractionDigits: 2})}
+            </span>
+          </div>
+        </div>
+
+        <div className="bg-blue-50 rounded-2xl p-6 shadow-sm border border-blue-100 hover:shadow-md transition-shadow relative overflow-hidden">
+          <div className="absolute -right-4 -top-4 opacity-10">
+            <Wallet size={100} />
+          </div>
+          <div className="flex justify-between items-start mb-6 relative z-10">
+            <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
               <Wallet size={20} />
             </div>
-            <span className="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">Activo</span>
+            <span className="text-xs font-bold text-blue-600 bg-blue-100 px-3 py-1 rounded-full uppercase tracking-wide">Desglose</span>
           </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-medium text-neutral-500 mb-1">Cobros Registrados</span>
-            <span className="text-2xl font-bold text-neutral-900">
-              ${totalCobros.toLocaleString(undefined, {minimumFractionDigits: 2})}
-            </span>
-          </div>
-        </div>
-        
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-200">
-          <div className="flex justify-between items-start mb-4">
-            <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
-              <DollarSign size={20} />
+          <div className="flex flex-col gap-3 relative z-10">
+            <div className="flex justify-between items-center border-b border-blue-200/50 pb-2">
+              <span className="text-sm font-semibold text-blue-800">Efectivo</span>
+              <span className="text-base font-black text-blue-900">${ingresosEfectivo.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
             </div>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-medium text-neutral-500 mb-1">Abonos Realizados</span>
-            <span className="text-2xl font-bold text-neutral-900">{(abonos || []).length}</span>
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-semibold text-blue-800">Transferencia</span>
+              <span className="text-base font-black text-blue-900">${ingresosTransferencia.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+            </div>
           </div>
         </div>
 
-        <div className="bg-red-50 rounded-2xl p-6 shadow-sm border border-red-200">
-          <div className="flex justify-between items-start mb-4">
-            <div className="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center">
-              <AlertTriangle size={20} />
-            </div>
-            <span className="text-xs font-medium text-red-600 bg-red-100 px-2 py-1 rounded-full">En Riesgo</span>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-medium text-red-600/80 mb-1">Monto en Mora</span>
-            <span className="text-2xl font-bold text-red-600">
-              ${totalMora.toLocaleString(undefined, {minimumFractionDigits: 2})}
-            </span>
-          </div>
-        </div>
+
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <div className="xl:col-span-2 space-y-6">
+      <div className="w-full space-y-6">
           <div className="flex flex-col sm:flex-row gap-3">
             <button className="flex flex-1 items-center justify-center gap-2 px-4 py-2.5 bg-white border border-neutral-200 rounded-xl text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors">
               <Calendar size={16} className="text-neutral-400" />
@@ -165,7 +215,12 @@ const Payments = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4 text-sm text-neutral-600">
-                          {new Date(abono.fecha_pago).toLocaleDateString()}
+                          {new Date(abono.fecha_pago).toLocaleDateString('es-MX', {
+                            timeZone: 'UTC',
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit'
+                          })}
                         </td>
                         <td className="px-6 py-4 font-semibold text-emerald-600">
                           ${abono.monto_pagado.toLocaleString(undefined, {minimumFractionDigits: 2})} {abono.moneda || 'MXN'}
@@ -197,55 +252,7 @@ const Payments = () => {
               </div>
             )}
           </div>
-        </div>
-
-        <div className="xl:col-span-1">
-          <div className="bg-white rounded-2xl shadow-sm border border-neutral-200 flex flex-col h-full">
-            <div className="p-6 border-b border-neutral-100">
-              <div className="flex items-center gap-2 mb-1">
-                <AlertTriangle size={18} className="text-red-500" />
-                <h3 className="text-lg font-bold text-neutral-900">Adeudos Vencidos</h3>
-              </div>
-              <p className="text-sm text-neutral-500">Atención requerida para clientes en mora.</p>
-            </div>
-            
-            <div className="p-6 flex-1 flex flex-col">
-              {loading ? (
-                <div className="py-10 text-center text-neutral-500">Cargando...</div>
-              ) : !(morosos?.length > 0) ? (
-                 <div className="flex-1 flex flex-col items-center justify-center py-10 text-neutral-400">
-                  <CheckCircle2 size={48} className="mb-4 opacity-20 text-emerald-500" />
-                  <p className="font-medium text-neutral-600">Todo al corriente</p>
-                  <p className="text-sm text-center mt-1">No hay adeudos vencidos en este momento.</p>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-4">
-                  {(morosos || []).map(debt => (
-                    <div key={debt.id} className="p-4 rounded-xl border border-red-100 bg-red-50/30">
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="flex flex-col">
-                          <span className="font-semibold text-neutral-900">{debt.nombre_completo}</span>
-                          <span className="text-xs text-neutral-500">Lote {debt.terreno_clave}</span>
-                        </div>
-                        <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded-md">{debt.dias_retraso} días</span>
-                      </div>
-                      <div className="flex justify-between items-end mt-4">
-                        <div className="flex flex-col">
-                          <span className="text-[10px] uppercase font-bold text-neutral-400">P. {debt.numero_periodo}</span>
-                          <span className="font-bold text-red-600">
-                            ${debt.monto_esperado.toLocaleString(undefined, {minimumFractionDigits: 2})}
-                          </span>
-                        </div>
-                        <button className="text-sm font-medium text-orange-600 hover:text-orange-700 transition-colors">Ver</button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-        </div>
+      </div>
         
         {isModalOpen && (
           <ErrorBoundary>

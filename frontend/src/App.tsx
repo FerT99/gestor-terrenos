@@ -10,6 +10,7 @@ import Payments from './components/Payments';
 import Settings from './components/Settings';
 import Login from './components/Login';
 import NewSaleModal from './components/NewSaleModal';
+import Morosos from './components/Morosos';
 import { useAuth } from './hooks/useAuth';
 import { api } from './lib/api';
 
@@ -140,9 +141,14 @@ function App() {
                 setSelectedClienteId(null);
                 setCurrentView('clients');
               }} 
+              onViewTerreno={(terrenoId) => {
+                setSelectedTerrenoId(terrenoId);
+                setCurrentView('terreno_detail');
+              }}
             />
           )}
-          {currentView === 'payments' && <Payments />}
+          {currentView === 'payments' && <Payments onViewMorosos={() => setCurrentView('morosos')} />}
+          {currentView === 'morosos' && <Morosos onBack={() => setCurrentView('payments')} />}
           {currentView === 'settings' && <Settings />}
         </div>
       </div>

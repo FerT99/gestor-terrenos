@@ -17,9 +17,9 @@ const NewSaleModal: React.FC<NewSaleModalProps> = ({ onClose, onSuccess }) => {
   const [selectedTerreno, setSelectedTerreno] = useState('');
   const [selectedCliente, setSelectedCliente] = useState('');
 
-  const [montoTotal, setMontoTotal] = useState(0);
-  const [enganche, setEnganche] = useState(0);
-  const [plazos, setPlazos] = useState(12);
+  const [montoTotal, setMontoTotal] = useState<number | ''>('');
+  const [enganche, setEnganche] = useState<number | ''>('');
+  const [plazos, setPlazos] = useState<number | ''>(40);
   const [fechaInicio, setFechaInicio] = useState(new Date().toISOString().split('T')[0]);
   const [moneda, setMoneda] = useState('MXN');
 
@@ -30,7 +30,7 @@ const NewSaleModal: React.FC<NewSaleModalProps> = ({ onClose, onSuccess }) => {
           api.terrenos.getAll(),
           api.clientes.getAll()
         ]);
-        setTerrenos(terrenosData.filter(t => t.estado === 'disponible' || t.estado === 'apartado'));
+        setTerrenos(terrenosData.filter(t => t.estado.toLowerCase() === 'disponible' || t.estado.toLowerCase() === 'apartado'));
         setClientes(clientesData.filter(c => c.estado === 'Activo'));
       } catch (err: any) {
         setError(err.message || 'Error al cargar datos básicos');
@@ -76,8 +76,8 @@ const NewSaleModal: React.FC<NewSaleModalProps> = ({ onClose, onSuccess }) => {
     }
   };
 
-  const montoFinanciar = montoTotal - enganche;
-  const mensualidad = plazos > 0 ? montoFinanciar / plazos : 0;
+  const montoFinanciar = Number(montoTotal) - Number(enganche);
+  const mensualidad = Number(plazos) > 0 ? montoFinanciar / Number(plazos) : 0;
 
   return (
     <div className="fixed inset-0 bg-neutral-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -139,7 +139,7 @@ const NewSaleModal: React.FC<NewSaleModalProps> = ({ onClose, onSuccess }) => {
                   <input
                     type="number"
                     value={montoTotal}
-                    onChange={(e) => setMontoTotal(Number(e.target.value))}
+                    onChange={(e) => setMontoTotal(e.target.value === '' ? '' : Number(e.target.value))}
                     required
                     min="0"
                     className="w-full bg-white border border-neutral-300 text-neutral-900 text-sm rounded-xl focus:ring-orange-500 focus:border-orange-500 block p-2.5"
@@ -162,7 +162,7 @@ const NewSaleModal: React.FC<NewSaleModalProps> = ({ onClose, onSuccess }) => {
                   <input
                     type="number"
                     value={enganche}
-                    onChange={(e) => setEnganche(Number(e.target.value))}
+                    onChange={(e) => setEnganche(e.target.value === '' ? '' : Number(e.target.value))}
                     min="0"
                     className="w-full bg-white border border-neutral-300 text-neutral-900 text-sm rounded-xl focus:ring-orange-500 focus:border-orange-500 block p-2.5"
                   />
@@ -175,10 +175,9 @@ const NewSaleModal: React.FC<NewSaleModalProps> = ({ onClose, onSuccess }) => {
                   <input
                     type="number"
                     value={plazos}
-                    onChange={(e) => setPlazos(Number(e.target.value))}
-                    min="1"
-                    required
-                    className="w-full bg-white border border-neutral-300 text-neutral-900 text-sm rounded-xl focus:ring-orange-500 focus:border-orange-500 block p-2.5"
+                    disabled
+                    readOnly
+                    className="w-full bg-neutral-100 border border-neutral-200 text-neutral-500 text-sm rounded-xl block p-2.5 cursor-not-allowed"
                   />
                 </div>
                 <div className="space-y-2">
@@ -194,7 +193,7 @@ const NewSaleModal: React.FC<NewSaleModalProps> = ({ onClose, onSuccess }) => {
               </div>
             </div>
 
-            {selectedTerreno && montoTotal > 0 && (
+            {selectedTerreno && Number(montoTotal) > 0 && (
               <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <p className="text-[10px] uppercase font-bold text-orange-600/70">Monto a Financiar</p>

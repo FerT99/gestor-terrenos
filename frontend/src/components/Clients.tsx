@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Filter, ArrowUpDown, UserPlus, Mail, Phone, Loader2, Edit2, Trash2 } from 'lucide-react';
 import { api, type Cliente, type ClienteInput } from '../lib/api';
 import ClienteModal from './ClienteModal';
+import ConfirmModal from './ConfirmModal';
 
 interface ClientsProps {
   searchQuery?: string;
@@ -16,6 +17,7 @@ const Clients: React.FC<ClientsProps> = ({ searchQuery = '', onSelectCliente }) 
   const [clientToEdit, setClientToEdit] = useState<Cliente | null>(null);
   const [morososIds, setMorososIds] = useState<Set<string>>(new Set());
   const [clientLotesCount, setClientLotesCount] = useState<Record<string, number>>({});
+  const [confirmDelete, setConfirmDelete] = useState<{isOpen: boolean, clientId: string | null}>({ isOpen: false, clientId: null });
 
   useEffect(() => {
     fetchClientes();
@@ -55,13 +57,20 @@ const Clients: React.FC<ClientsProps> = ({ searchQuery = '', onSelectCliente }) 
     await fetchClientes();
   };
 
-  const handleDeleteCliente = async (id: string) => {
-    if (!window.confirm('¿Estás seguro de eliminar este cliente?')) return;
+  const handleDeleteClick = (id: string) => {
+    setConfirmDelete({ isOpen: true, clientId: id });
+  };
+
+  const handleConfirmDelete = async () => {
+    const id = confirmDelete.clientId;
+    if (!id) return;
     try {
       await api.clientes.delete(id);
       await fetchClientes();
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Error al eliminar');
+    } finally {
+      setConfirmDelete({ isOpen: false, clientId: null });
     }
   };
 
@@ -141,7 +150,7 @@ const Clients: React.FC<ClientsProps> = ({ searchQuery = '', onSelectCliente }) 
                   <Edit2 size={18} />
                 </button>
                 <button 
-                  onClick={() => handleDeleteCliente(client.id)}
+                  onClick={() => handleDeleteClick(client.id)}
                   className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors tooltip-trigger" 
                   title="Eliminar Cliente"
                 >
@@ -205,6 +214,14 @@ const Clients: React.FC<ClientsProps> = ({ searchQuery = '', onSelectCliente }) 
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleSaveCliente}
         initialData={clientToEdit}
+      />
+
+      <ConfirmModal
+        isOpen={confirmDelete.isOpen}
+        title="Eliminar Cliente"
+        message="¿Estás seguro de eliminar este cliente? Se eliminarán también sus planes de pago y abonos asociados."
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setConfirmDelete({ isOpen: false, clientId: null })}
       />
     </main>
   );
