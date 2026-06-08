@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Filter, ArrowUpDown, UserPlus, Mail, Phone, Loader2, Edit2, Trash2 } from 'lucide-react';
+import { UserPlus, Mail, Phone, Loader2, Edit2, Trash2 } from 'lucide-react';
 import { api, type Cliente, type ClienteInput } from '../lib/api';
 import ClienteModal from './ClienteModal';
 import ConfirmModal from './ConfirmModal';

@@ -62,7 +62,6 @@ const Dashboard = () => {
 
   // Calculate Adeudos Vencidos
   const overdueCount = morosos.length;
-  const totalMora = morosos.reduce((acc, curr) => acc + curr.monto_esperado, 0);
 
   return (
     <main className="p-6 md:p-10 max-w-7xl mx-auto space-y-8">

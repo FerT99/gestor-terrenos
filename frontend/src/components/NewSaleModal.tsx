@@ -19,7 +19,7 @@ const NewSaleModal: React.FC<NewSaleModalProps> = ({ onClose, onSuccess }) => {
 
   const [montoTotal, setMontoTotal] = useState<number | ''>('');
   const [enganche, setEnganche] = useState<number | ''>('');
-  const [plazos, setPlazos] = useState<number | ''>(40);
+  const [plazos] = useState<number | ''>(40);
   const [fechaInicio, setFechaInicio] = useState(new Date().toISOString().split('T')[0]);
   const [moneda, setMoneda] = useState('MXN');
 
@@ -50,7 +50,7 @@ const NewSaleModal: React.FC<NewSaleModalProps> = ({ onClose, onSuccess }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (!selectedTerreno || !selectedCliente || montoTotal <= 0) {
+    if (!selectedTerreno || !selectedCliente || Number(montoTotal) <= 0) {
       setError('Por favor completa los campos requeridos.');
       return;
     }

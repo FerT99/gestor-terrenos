@@ -2,12 +2,10 @@ import { useState, useEffect } from 'react';
 import { 
   PlusCircle, 
   Wallet, 
-  DollarSign, 
   AlertTriangle, 
   Calendar, 
   Filter, 
   Banknote,
-  CheckCircle2,
   FileText
 } from 'lucide-react';
 import { api, type Abono, type ClienteMoroso, type Terreno, type PlanPago } from '../lib/api';
@@ -55,7 +53,7 @@ const Payments: React.FC<PaymentsProps> = ({ onViewMorosos }) => {
   };
 
   const totalCobros = (abonos || []).reduce((acc, curr) => acc + curr.monto_pagado, 0);
-  const totalMora = (morosos || []).reduce((acc, curr) => acc + curr.monto_esperado, 0);
+
 
   const lotesApartados = terrenos.filter(t => t.estado.toLowerCase() === 'apartado').length;
   const lotesAbonados = terrenos.filter(t => t.estado.toLowerCase() === 'vendido').length;

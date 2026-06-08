@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, Map, Users, CreditCard, Settings, HelpCircle, LogOut, Plus } from 'lucide-react';
+import { LayoutDashboard, Map, Users, CreditCard, Settings, LogOut, Plus } from 'lucide-react';
 import { api } from '../lib/api';
 import type { Parcela } from '../lib/api';
 
