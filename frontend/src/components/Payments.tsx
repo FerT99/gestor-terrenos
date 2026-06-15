@@ -69,9 +69,6 @@ const Payments: React.FC<PaymentsProps> = ({ onViewMorosos }) => {
   const totalEgresos = (egresos || []).reduce((acc, curr) => acc + (Number(curr.monto) || 0), 0);
   const utilidadNeta = totalCobros - totalEgresos;
 
-  const ingresosEfectivo = abonos.filter(a => a.metodo_pago?.toLowerCase() === 'efectivo').reduce((acc, curr) => acc + curr.monto_pagado, 0);
-  const ingresosTransferencia = abonos.filter(a => a.metodo_pago?.toLowerCase() === 'transferencia').reduce((acc, curr) => acc + curr.monto_pagado, 0);
-
 
   return (
     <ErrorBoundary>
