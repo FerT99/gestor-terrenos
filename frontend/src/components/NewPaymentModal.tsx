@@ -336,19 +336,7 @@ const NewPaymentModal: React.FC<NewPaymentModalProps> = ({ onClose, onSuccess, i
               </div>
             )}
             
-            <div className="md:col-span-2 space-y-1.5 mt-2">
-              <label className="text-sm font-semibold text-neutral-700">Comprobante de Pago (Opcional)</label>
-              <input 
-                type="file"
-                accept="image/*,.pdf"
-                onChange={(e) => {
-                  if (e.target.files && e.target.files[0]) {
-                    setComprobanteFile(e.target.files[0]);
-                  }
-                }}
-                className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-neutral-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
-              />
-            </div>
+            {/* Upload File Input Removed - Now generating automatic PDFs */}
             
             <div className="md:col-span-2 space-y-3 mt-2">
               <div className="flex items-center gap-2">

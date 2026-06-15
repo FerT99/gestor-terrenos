@@ -9,6 +9,7 @@ import {
   FileText
 } from 'lucide-react';
 import { api, type Abono, type Terreno, type PlanPago, type Egreso } from '../lib/api';
+import { generateReceipt } from '../lib/pdfGenerator';
 import NewPaymentModal from './NewPaymentModal';
 import ErrorBoundary from './ErrorBoundary';
 
@@ -230,19 +231,14 @@ const Payments: React.FC<PaymentsProps> = ({ onViewMorosos }) => {
                           ${abono.monto_pagado.toLocaleString(undefined, {minimumFractionDigits: 2})} {abono.moneda || 'MXN'}
                         </td>
                         <td className="px-6 py-4 text-right">
-                          {abono.comprobante_url ? (
-                            <a 
-                              href={abono.comprobante_url} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center justify-center p-2 text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors"
-                              title="Ver comprobante"
-                            >
-                              <FileText size={18} />
-                            </a>
-                          ) : (
-                            <span className="text-neutral-300 text-sm">-</span>
-                          )}
+                          <button 
+                            onClick={() => generateReceipt(abono)}
+                            className="inline-flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-bold text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors border border-orange-200"
+                            title="Generar Recibo PDF"
+                          >
+                            <FileText size={14} />
+                            <span>Generar</span>
+                          </button>
                         </td>
                       </tr>
                     ))}
