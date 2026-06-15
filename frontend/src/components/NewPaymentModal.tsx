@@ -20,7 +20,6 @@ const NewPaymentModal: React.FC<NewPaymentModalProps> = ({ onClose, onSuccess, i
   const [montoTransferencia, setMontoTransferencia] = useState<number | ''>('');
   const [moneda, setMoneda] = useState('MXN');
   const [fechaPago, setFechaPago] = useState(new Date().toISOString().split('T')[0]);
-  const [comprobanteFile, setComprobanteFile] = useState<File | null>(null);
   const [tipoCambio, setTipoCambio] = useState<number | ''>('');
   const [isFetchingExchange, setIsFetchingExchange] = useState(false);
   const [aplicarMora, setAplicarMora] = useState(false);
@@ -125,11 +124,6 @@ const NewPaymentModal: React.FC<NewPaymentModalProps> = ({ onClose, onSuccess, i
     setError('');
 
     try {
-      let comprobante_url = '';
-      if (comprobanteFile) {
-        comprobante_url = await api.abonos.uploadComprobante(comprobanteFile);
-      }
-
       const periodoSeleccionado = (periodos || []).find(p => p.id === selectedPeriodoId);
       let moraFinal = aplicarMora 
         ? (tipoMora === 'porcentaje' 
@@ -143,7 +137,6 @@ const NewPaymentModal: React.FC<NewPaymentModalProps> = ({ onClose, onSuccess, i
         notas: '',
         tipo_cambio: moneda === 'USD' && tipoCambio !== '' ? Number(tipoCambio) : undefined,
         moneda: moneda,
-        comprobante_url: comprobante_url || undefined,
       };
 
       if (metodoPago === 'Mixto') {
