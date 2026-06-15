@@ -146,13 +146,19 @@ const TerrenoDetail: React.FC<TerrenoDetailProps> = ({ terrenoId, onBack }) => {
     );
   }
 
-  const totalPagado = abonos.reduce((sum, a) => sum + a.monto_pagado, 0);
-  const totalRestante = plan ? plan.monto_total - plan.enganche - totalPagado : 0;
-
-  // Enganche Dinámico
+  const totalPagado = abonos.reduce((sum, a) => sum + (Number(a.monto_pagado) || 0), 0);
+  const enganchePlan = plan ? Number(plan.enganche) || 0 : 0;
+  
+  // Enganche Dinámico (Solo para visualización en la tarjeta de enganche)
   const primerAbono = abonos.length > 0 ? abonos[0] : null;
-  const engancheMostrado = (plan && plan.enganche > 0) ? plan.enganche : (primerAbono ? primerAbono.monto_pagado : 0);
-  const totalPagadoMostrado = (plan && plan.enganche === 0 && primerAbono) ? totalPagado - primerAbono.monto_pagado : totalPagado;
+  const engancheMostrado = enganchePlan > 0 ? enganchePlan : (primerAbono ? Number(primerAbono.monto_pagado) || 0 : 0);
+  
+  // Total Pagado muestra TODO el dinero ingresado
+  const totalPagadoMostrado = enganchePlan > 0 ? totalPagado + enganchePlan : totalPagado;
+
+  // Calculamos la deuda basándonos en el precio de lista para que empate con lo mostrado arriba
+  const baseDeuda = terreno ? Number(terreno.precio_lista) || 0 : (plan ? Number(plan.monto_total) || 0 : 0);
+  const totalRestante = Math.max(0, baseDeuda - totalPagadoMostrado);
 
   return (
     <div className="p-6 md:p-10 max-w-5xl mx-auto min-h-[calc(100vh-4rem)]">
@@ -203,7 +209,7 @@ const TerrenoDetail: React.FC<TerrenoDetailProps> = ({ terrenoId, onBack }) => {
       {plan && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-200">
-            <span className="text-sm font-medium text-neutral-500 mb-2 block">Total Pagado en Abonos</span>
+            <span className="text-sm font-medium text-neutral-500 mb-2 block">Total Pagado</span>
             <span className="text-3xl font-bold text-emerald-600">
               ${totalPagadoMostrado.toLocaleString('es-MX', {minimumFractionDigits: 2})}
             </span>

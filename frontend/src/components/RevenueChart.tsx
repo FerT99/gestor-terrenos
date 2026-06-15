@@ -4,9 +4,10 @@ import { type Abono } from '../lib/api';
 
 interface RevenueChartProps {
   abonos: Abono[];
+  onMonthClick?: (monthIndex: number, year: number) => void;
 }
 
-const RevenueChart: React.FC<RevenueChartProps> = ({ abonos }) => {
+const RevenueChart: React.FC<RevenueChartProps> = ({ abonos, onMonthClick }) => {
   const [selectedYear, setSelectedYear] = useState(2026);
 
   const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
@@ -51,13 +52,16 @@ const RevenueChart: React.FC<RevenueChartProps> = ({ abonos }) => {
       </div>
       
       <div className="flex items-end justify-between pt-4 h-64 gap-2 w-full">
-        {data.map((item) => (
+        {data.map((item, index) => (
           <div key={item.month} className="flex flex-col items-center gap-3 flex-1 justify-end group relative">
             {/* Tooltip on hover */}
             <div className="absolute bottom-full mb-2 bg-neutral-900 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10 font-bold shadow-md">
               ${item.value.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
             </div>
-            <div className="w-full relative flex items-end justify-center h-48 bg-neutral-50/50 rounded-t-lg overflow-hidden group-hover:bg-neutral-100 transition-colors">
+            <div 
+              className={`w-full relative flex items-end justify-center h-48 bg-neutral-50/50 rounded-t-lg overflow-hidden transition-colors ${onMonthClick ? 'cursor-pointer group-hover:bg-neutral-100 hover:ring-2 hover:ring-orange-300' : 'group-hover:bg-neutral-100'}`}
+              onClick={() => onMonthClick && onMonthClick(index, selectedYear)}
+            >
               <div 
                 className={`w-full rounded-t-lg transition-all duration-500 ${item.active ? 'bg-gradient-to-t from-orange-500 to-orange-400 shadow-md shadow-orange-200' : 'bg-neutral-200 group-hover:bg-neutral-300'}`} 
                 style={{ height: `${Math.max(item.heightPct, 4)}%` }}

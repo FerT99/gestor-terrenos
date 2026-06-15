@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, Map, Users, CreditCard, Settings, LogOut, Plus } from 'lucide-react';
+import { LayoutDashboard, Map, Users, CreditCard, Settings, LogOut, Plus, Wallet } from 'lucide-react';
 import { api } from '../lib/api';
 import type { Parcela } from '../lib/api';
 
@@ -16,6 +16,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView, onLogout
     { id: 'catalog', icon: Map, label: 'Catálogo de Terrenos' },
     { id: 'clients', icon: Users, label: 'Clientes' },
     { id: 'payments', icon: CreditCard, label: 'Pagos' },
+    { id: 'egresos', icon: Wallet, label: 'Egresos' },
   ];
 
   const userRole = localStorage.getItem('user_role') || 'vendedor';

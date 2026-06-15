@@ -15,10 +15,17 @@ const NewPaymentModal: React.FC<NewPaymentModalProps> = ({ onClose, onSuccess, i
   const [selectedPeriodoId, setSelectedPeriodoId] = useState<string>('');
   
   const [montoPagado, setMontoPagado] = useState<number | ''>('');
+  const [metodoPago, setMetodoPago] = useState<'Efectivo' | 'Transferencia' | 'Mixto'>('Transferencia');
+  const [montoEfectivo, setMontoEfectivo] = useState<number | ''>('');
+  const [montoTransferencia, setMontoTransferencia] = useState<number | ''>('');
   const [moneda, setMoneda] = useState('MXN');
   const [fechaPago, setFechaPago] = useState(new Date().toISOString().split('T')[0]);
   const [comprobanteFile, setComprobanteFile] = useState<File | null>(null);
-  const [perdonarMora, setPerdonarMora] = useState(false);
+  const [tipoCambio, setTipoCambio] = useState<number | ''>('');
+  const [isFetchingExchange, setIsFetchingExchange] = useState(false);
+  const [aplicarMora, setAplicarMora] = useState(false);
+  const [tipoMora, setTipoMora] = useState<'fija' | 'porcentaje'>('fija');
+  const [moraAplicada, setMoraAplicada] = useState<number | ''>('');
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -68,11 +75,31 @@ const NewPaymentModal: React.FC<NewPaymentModalProps> = ({ onClose, onSuccess, i
       const periodo = (periodos || []).find(p => p.id === selectedPeriodoId);
       if (periodo) {
         setMontoPagado(periodo.monto_esperado);
+        setMontoEfectivo(periodo.monto_esperado);
+        setMontoTransferencia('');
       }
     } else {
       setMontoPagado('');
+      setMontoEfectivo('');
+      setMontoTransferencia('');
     }
   }, [selectedPeriodoId, periodos]);
+
+  // Fetch exchange rate when USD is selected
+  useEffect(() => {
+    if (moneda === 'USD' && tipoCambio === '') {
+      setIsFetchingExchange(true);
+      fetch('https://api.exchangerate-api.com/v4/latest/USD')
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.rates && data.rates.MXN) {
+            setTipoCambio(data.rates.MXN);
+          }
+        })
+        .catch(err => console.error("Error fetching exchange rate:", err))
+        .finally(() => setIsFetchingExchange(false));
+    }
+  }, [moneda]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,9 +107,18 @@ const NewPaymentModal: React.FC<NewPaymentModalProps> = ({ onClose, onSuccess, i
       setError('Este terreno no tiene pagos pendientes.');
       return;
     }
-    if (!montoPagado) {
-      setError('Por favor define el monto.');
-      return;
+    if (metodoPago === 'Mixto') {
+      const ef = Number(montoEfectivo) || 0;
+      const tr = Number(montoTransferencia) || 0;
+      if (ef + tr <= 0) {
+        setError('Por favor define los montos para el pago mixto.');
+        return;
+      }
+    } else {
+      if (!montoPagado) {
+        setError('Por favor define el monto.');
+        return;
+      }
     }
 
     setLoading(true);
@@ -94,16 +130,52 @@ const NewPaymentModal: React.FC<NewPaymentModalProps> = ({ onClose, onSuccess, i
         comprobante_url = await api.abonos.uploadComprobante(comprobanteFile);
       }
 
-      await api.abonos.create({
+      const periodoSeleccionado = (periodos || []).find(p => p.id === selectedPeriodoId);
+      let moraFinal = aplicarMora 
+        ? (tipoMora === 'porcentaje' 
+            ? ((periodoSeleccionado?.monto_esperado || 0) * (Number(moraAplicada) || 0) / 100) 
+            : (Number(moraAplicada) || 0))
+        : 0;
+
+      const baseAbono = {
         periodo_pago_id: selectedPeriodoId,
-        monto_pagado: Number(montoPagado),
         fecha_pago: fechaPago,
-        metodo_pago: 'Transferencia',
         notas: '',
-        perdonar_mora: perdonarMora,
+        tipo_cambio: moneda === 'USD' && tipoCambio !== '' ? Number(tipoCambio) : undefined,
         moneda: moneda,
         comprobante_url: comprobante_url || undefined,
-      });
+      };
+
+      if (metodoPago === 'Mixto') {
+        const ef = Number(montoEfectivo) || 0;
+        const tr = Number(montoTransferencia) || 0;
+        
+        if (ef > 0) {
+          await api.abonos.create({
+            ...baseAbono,
+            monto_pagado: ef,
+            metodo_pago: 'Efectivo',
+            mora_aplicada: moraFinal,
+          });
+          moraFinal = 0; // Solo aplicar mora al primer abono para no duplicar
+        }
+        if (tr > 0) {
+          await api.abonos.create({
+            ...baseAbono,
+            monto_pagado: tr,
+            metodo_pago: 'Transferencia',
+            mora_aplicada: moraFinal,
+          });
+        }
+      } else {
+        await api.abonos.create({
+          ...baseAbono,
+          monto_pagado: Number(montoPagado),
+          metodo_pago: metodoPago,
+          mora_aplicada: moraFinal,
+        });
+      }
+
       onSuccess();
     } catch (err: any) {
       setError(err.message || 'Error al registrar el abono.');
@@ -167,22 +239,71 @@ const NewPaymentModal: React.FC<NewPaymentModalProps> = ({ onClose, onSuccess, i
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-neutral-700">Monto del Abono ($)</label>
-              <input 
-                type="number"
-                required
-                min="0.01"
-                step="0.01"
-                value={montoPagado}
-                onChange={(e) => setMontoPagado(e.target.value === '' ? '' : Number(e.target.value))}
+              <label className="text-sm font-semibold text-neutral-700">Método de Pago</label>
+              <select 
+                value={metodoPago}
+                onChange={(e) => setMetodoPago(e.target.value as any)}
                 className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-neutral-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all"
-              />
+              >
+                <option value="Transferencia">Transferencia</option>
+                <option value="Efectivo">Efectivo</option>
+                <option value="Mixto">Mixto (Efectivo y Transferencia)</option>
+              </select>
             </div>
+
+            {metodoPago === 'Mixto' ? (
+              <div className="md:col-span-2 grid grid-cols-2 gap-4 border border-orange-100 bg-orange-50/50 p-4 rounded-xl">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold text-neutral-700">Monto Efectivo ($)</label>
+                  <input 
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={montoEfectivo}
+                    onChange={(e) => setMontoEfectivo(e.target.value === '' ? '' : Number(e.target.value))}
+                    className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-neutral-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold text-neutral-700">Monto Transferencia ($)</label>
+                  <input 
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={montoTransferencia}
+                    onChange={(e) => setMontoTransferencia(e.target.value === '' ? '' : Number(e.target.value))}
+                    className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-neutral-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all"
+                  />
+                </div>
+                <div className="col-span-2 text-right">
+                  <span className="text-sm font-bold text-neutral-600">
+                    Suma Total: ${((Number(montoEfectivo) || 0) + (Number(montoTransferencia) || 0)).toLocaleString('es-MX', {minimumFractionDigits: 2})}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-1.5">
+                <label className="text-sm font-semibold text-neutral-700">Monto del Abono ($)</label>
+                <input 
+                  type="number"
+                  required
+                  min="0.01"
+                  step="0.01"
+                  value={montoPagado}
+                  onChange={(e) => setMontoPagado(e.target.value === '' ? '' : Number(e.target.value))}
+                  className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-neutral-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all"
+                />
+              </div>
+            )}
+
             <div className="space-y-1.5">
               <label className="text-sm font-semibold text-neutral-700">Moneda</label>
               <select 
                 value={moneda}
-                onChange={(e) => setMoneda(e.target.value)}
+                onChange={(e) => {
+                  setMoneda(e.target.value);
+                  if (e.target.value !== 'USD') setTipoCambio('');
+                }}
                 className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-neutral-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all"
               >
                 <option value="MXN">MXN - Pesos Mexicanos</option>
@@ -190,7 +311,32 @@ const NewPaymentModal: React.FC<NewPaymentModalProps> = ({ onClose, onSuccess, i
               </select>
             </div>
             
-            <div className="md:col-span-2 space-y-1.5">
+            {moneda === 'USD' && (
+              <div className="space-y-1.5 animate-in fade-in duration-200">
+                <label className="text-sm font-semibold text-neutral-700 flex items-center justify-between">
+                  <span>Tipo de Cambio (MXN)</span>
+                  {isFetchingExchange && <span className="text-xs text-neutral-400">Actualizando...</span>}
+                </label>
+                <div className="flex items-center gap-2">
+                  <span className="text-neutral-500 font-medium px-1">$</span>
+                  <input 
+                    type="number"
+                    min="0"
+                    step="0.0001"
+                    value={tipoCambio}
+                    onChange={(e) => setTipoCambio(e.target.value === '' ? '' : Number(e.target.value))}
+                    className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-neutral-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all"
+                  />
+                </div>
+                {tipoCambio !== '' && montoPagado !== '' && (
+                  <p className="text-xs text-neutral-500 font-medium">
+                    Equivalente: ${(Number(montoPagado) * Number(tipoCambio)).toLocaleString('es-MX', {minimumFractionDigits: 2})} MXN
+                  </p>
+                )}
+              </div>
+            )}
+            
+            <div className="md:col-span-2 space-y-1.5 mt-2">
               <label className="text-sm font-semibold text-neutral-700">Comprobante de Pago (Opcional)</label>
               <input 
                 type="file"
@@ -204,17 +350,73 @@ const NewPaymentModal: React.FC<NewPaymentModalProps> = ({ onClose, onSuccess, i
               />
             </div>
             
-            <div className="md:col-span-2 flex items-center gap-2 mt-2">
-              <input 
-                type="checkbox" 
-                id="perdonarMora"
-                checked={perdonarMora}
-                onChange={(e) => setPerdonarMora(e.target.checked)}
-                className="w-4 h-4 text-orange-600 rounded border-neutral-300 focus:ring-orange-500"
-              />
-              <label htmlFor="perdonarMora" className="text-sm font-medium text-neutral-700 cursor-pointer">
-                Perdonar mora (si el pago está atrasado, no se cobrará el recargo)
-              </label>
+            <div className="md:col-span-2 space-y-3 mt-2">
+              <div className="flex items-center gap-2">
+                <input 
+                  type="checkbox" 
+                  id="aplicarMora"
+                  checked={aplicarMora}
+                  onChange={(e) => {
+                    setAplicarMora(e.target.checked);
+                    if (!e.target.checked) setMoraAplicada('');
+                  }}
+                  className="w-4 h-4 text-orange-600 rounded border-neutral-300 focus:ring-orange-500 cursor-pointer"
+                />
+                <label htmlFor="aplicarMora" className="text-sm font-semibold text-neutral-700 cursor-pointer">
+                  Aplicar mora manual
+                </label>
+              </div>
+
+              {aplicarMora && (
+                <div className="pl-6 animate-in slide-in-from-top-2 duration-200 fade-in space-y-4 mt-3">
+                  <div className="flex items-center gap-6">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input 
+                        type="radio" 
+                        name="tipoMora" 
+                        value="fija" 
+                        checked={tipoMora === 'fija'} 
+                        onChange={() => setTipoMora('fija')} 
+                        className="w-4 h-4 text-orange-600 focus:ring-orange-500 border-neutral-300" 
+                      />
+                      <span className="text-sm font-medium text-neutral-700">Cantidad Fija ($)</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input 
+                        type="radio" 
+                        name="tipoMora" 
+                        value="porcentaje" 
+                        checked={tipoMora === 'porcentaje'} 
+                        onChange={() => setTipoMora('porcentaje')} 
+                        className="w-4 h-4 text-orange-600 focus:ring-orange-500 border-neutral-300" 
+                      />
+                      <span className="text-sm font-medium text-neutral-700">Porcentaje (%)</span>
+                    </label>
+                  </div>
+                  
+                  <div>
+                    <label className="text-sm font-semibold text-neutral-700 mb-1.5 block">
+                      {tipoMora === 'fija' ? 'Monto de Mora ($)' : 'Porcentaje de Mora (%)'}
+                    </label>
+                    <div className="flex items-center gap-3">
+                      <input 
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={moraAplicada}
+                        onChange={(e) => setMoraAplicada(e.target.value === '' ? '' : Number(e.target.value))}
+                        className="w-full md:w-1/2 px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-neutral-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all"
+                        placeholder="0.00"
+                      />
+                      {tipoMora === 'porcentaje' && moraAplicada !== '' && (
+                        <span className="text-sm text-neutral-500 font-medium whitespace-nowrap bg-neutral-50 px-3 py-1.5 rounded-lg border border-neutral-100">
+                          ≈ ${(((periodos.find(p => p.id === selectedPeriodoId)?.monto_esperado || 0) * Number(moraAplicada)) / 100).toLocaleString('es-MX', {minimumFractionDigits: 2})} extra
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </form>

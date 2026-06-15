@@ -8,7 +8,7 @@ import {
   Banknote,
   FileText
 } from 'lucide-react';
-import { api, type Abono, type Terreno, type PlanPago } from '../lib/api';
+import { api, type Abono, type Terreno, type PlanPago, type Egreso } from '../lib/api';
 import NewPaymentModal from './NewPaymentModal';
 import ErrorBoundary from './ErrorBoundary';
 
@@ -21,19 +21,23 @@ const Payments: React.FC<PaymentsProps> = ({ onViewMorosos }) => {
 
   const [terrenos, setTerrenos] = useState<Terreno[]>([]);
   const [planes, setPlanes] = useState<PlanPago[]>([]);
+  const [egresos, setEgresos] = useState<Egreso[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchData = async () => {
     try {
-      const [abonosData, terrenosData, planesData] = await Promise.all([
+      const parcelaId = localStorage.getItem('selected_parcela') || '';
+      const [abonosData, terrenosData, planesData, egresosData] = await Promise.all([
         api.abonos.getAll(),
         api.terrenos.getAll(),
-        api.planesPago.getAll()
+        api.planesPago.getAll(),
+        parcelaId ? api.egresos.getAll(parcelaId) : Promise.resolve([])
       ]);
       setAbonos(abonosData || []);
       setTerrenos(terrenosData || []);
       setPlanes(planesData || []);
+      setEgresos(egresosData || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -62,6 +66,9 @@ const Payments: React.FC<PaymentsProps> = ({ onViewMorosos }) => {
      return acc + mensualidad;
   }, 0);
   
+  const totalEgresos = (egresos || []).reduce((acc, curr) => acc + (Number(curr.monto) || 0), 0);
+  const utilidadNeta = totalCobros - totalEgresos;
+
   const ingresosEfectivo = abonos.filter(a => a.metodo_pago?.toLowerCase() === 'efectivo').reduce((acc, curr) => acc + curr.monto_pagado, 0);
   const ingresosTransferencia = abonos.filter(a => a.metodo_pago?.toLowerCase() === 'transferencia').reduce((acc, curr) => acc + curr.monto_pagado, 0);
 
@@ -106,8 +113,8 @@ const Payments: React.FC<PaymentsProps> = ({ onViewMorosos }) => {
           <span className="text-2xl font-black text-emerald-600">${valorCapital.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
         </div>
         <div className="bg-white rounded-2xl p-5 shadow-sm border border-neutral-200 flex flex-col justify-between hover:shadow-md transition-shadow">
-          <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider mb-2">Pagos Efectuados</span>
-          <span className="text-2xl font-black text-emerald-600">${totalCobros.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+          <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider mb-2">Utilidad Neta</span>
+          <span className="text-2xl font-black text-emerald-600">${utilidadNeta.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
         </div>
       </div>
 
@@ -142,12 +149,16 @@ const Payments: React.FC<PaymentsProps> = ({ onViewMorosos }) => {
           </div>
           <div className="flex flex-col gap-3 relative z-10">
             <div className="flex justify-between items-center border-b border-blue-200/50 pb-2">
-              <span className="text-sm font-semibold text-blue-800">Efectivo</span>
-              <span className="text-base font-black text-blue-900">${ingresosEfectivo.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+              <span className="text-sm font-semibold text-blue-800">Ingresos Brutos</span>
+              <span className="text-base font-black text-blue-900">${totalCobros.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-semibold text-blue-800">Transferencia</span>
-              <span className="text-base font-black text-blue-900">${ingresosTransferencia.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+            <div className="flex justify-between items-center border-b border-blue-200/50 pb-2">
+              <span className="text-sm font-semibold text-red-600">Egresos Registrados</span>
+              <span className="text-base font-black text-red-600">-${totalEgresos.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+            </div>
+            <div className="flex justify-between items-center pt-1">
+              <span className="text-sm font-bold text-emerald-800">Utilidad Neta</span>
+              <span className="text-lg font-black text-emerald-700">${utilidadNeta.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
             </div>
           </div>
         </div>

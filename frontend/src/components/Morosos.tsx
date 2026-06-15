@@ -5,9 +5,10 @@ import ErrorBoundary from './ErrorBoundary';
 
 interface MorososProps {
   onBack: () => void;
+  onViewTerreno?: (terrenoId: string) => void;
 }
 
-const Morosos: React.FC<MorososProps> = ({ onBack }) => {
+const Morosos: React.FC<MorososProps> = ({ onBack, onViewTerreno }) => {
   const [morosos, setMorosos] = useState<ClienteMoroso[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -57,7 +58,11 @@ const Morosos: React.FC<MorososProps> = ({ onBack }) => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {(morosos || []).map(debt => (
-                  <div key={debt.id} className="p-5 rounded-xl border border-red-100 bg-red-50/30 hover:shadow-md transition-all">
+                  <div 
+                    key={debt.id} 
+                    onClick={() => onViewTerreno && onViewTerreno(debt.terreno_id)}
+                    className="p-5 rounded-xl border border-red-100 bg-red-50/30 hover:shadow-md hover:-translate-y-0.5 hover:bg-red-50/80 transition-all cursor-pointer"
+                  >
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex flex-col">
                         <span className="font-semibold text-lg text-neutral-900">{debt.nombre_completo}</span>

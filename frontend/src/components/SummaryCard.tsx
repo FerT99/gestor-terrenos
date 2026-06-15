@@ -9,10 +9,11 @@ interface SummaryCardProps {
   trendUp?: boolean;
   isAlert?: boolean;
   variant?: 'orange' | 'green' | 'red';
+  onClick?: () => void;
 }
 
 const SummaryCard: React.FC<SummaryCardProps> = ({ 
-  title, value, subtitle, icon, trend, trendUp, isAlert, variant = 'orange'
+  title, value, subtitle, icon, trend, trendUp, isAlert, variant = 'orange', onClick
 }) => {
   const isRed = isAlert || variant === 'red';
   const isGreen = variant === 'green';
@@ -29,8 +30,12 @@ const SummaryCard: React.FC<SummaryCardProps> = ({
     iconClass = 'bg-emerald-100 text-emerald-600';
   }
 
+  if (onClick) {
+    cardClass += ' cursor-pointer hover:shadow-md transition-all hover:-translate-y-0.5';
+  }
+
   return (
-    <div className={`bg-white rounded-2xl p-6 shadow-sm border ${cardClass}`}>
+    <div className={`bg-white rounded-2xl p-6 shadow-sm border ${cardClass}`} onClick={onClick}>
       <div className="flex justify-between items-start mb-4">
         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${iconClass}`}>
           {icon}

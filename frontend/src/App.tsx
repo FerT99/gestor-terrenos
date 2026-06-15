@@ -11,6 +11,7 @@ import Settings from './components/Settings';
 import Login from './components/Login';
 import NewSaleModal from './components/NewSaleModal';
 import Morosos from './components/Morosos';
+import Egresos from './components/Egresos';
 import { useAuth } from './hooks/useAuth';
 import { api } from './lib/api';
 
@@ -106,7 +107,7 @@ function App() {
       <div className="flex-1 flex flex-col h-screen overflow-hidden relative">
         <Header currentView={currentView} searchQuery={globalSearch} onSearchChange={setGlobalSearch} />
         <div className="flex-1 overflow-y-auto">
-          {currentView === 'dashboard' && <Dashboard />}
+          {currentView === 'dashboard' && <Dashboard onViewMorosos={() => setCurrentView('morosos')} />}
           {currentView === 'catalog' && (
             <LandCatalog 
               searchQuery={globalSearch} 
@@ -148,7 +149,16 @@ function App() {
             />
           )}
           {currentView === 'payments' && <Payments onViewMorosos={() => setCurrentView('morosos')} />}
-          {currentView === 'morosos' && <Morosos onBack={() => setCurrentView('payments')} />}
+          {currentView === 'morosos' && (
+            <Morosos 
+              onBack={() => setCurrentView('payments')} 
+              onViewTerreno={(terrenoId) => {
+                setSelectedTerrenoId(terrenoId);
+                setCurrentView('terreno_detail');
+              }}
+            />
+          )}
+          {currentView === 'egresos' && <Egresos />}
           {currentView === 'settings' && <Settings />}
         </div>
       </div>

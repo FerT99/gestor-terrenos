@@ -130,6 +130,7 @@ export interface Abono {
   monto_pagado: number;
   fecha_pago: string;
   metodo_pago: string | null;
+  tipo_cambio?: number;
   comprobante_url: string | null;
   notas: string | null;
   moneda: string;
@@ -145,8 +146,9 @@ export interface AbonoInput {
   monto_pagado: number;
   fecha_pago: string;
   metodo_pago: string;
-  notas: string;
-  perdonar_mora: boolean;
+  notas?: string;
+  tipo_cambio?: number;
+  mora_aplicada?: number;
   moneda: string;
   comprobante_url?: string;
 }
@@ -156,6 +158,7 @@ export interface ClienteMoroso {
   nombre_completo: string;
   telefono: string;
   plan_id: string;
+  terreno_id: string;
   terreno_clave: string;
   periodo_id: string;
   numero_periodo: number;
@@ -165,6 +168,25 @@ export interface ClienteMoroso {
 }
 
 // ─── API ──────────────────────────────────────────────────────────────────────
+
+export interface Egreso {
+  id: string;
+  parcela_id: string;
+  fecha: string;
+  concepto: string;
+  monto: number;
+  categoria: string;
+  descripcion: string | null;
+  created_at: string;
+}
+
+export interface EgresoInput {
+  fecha: string;
+  concepto: string;
+  monto: number;
+  categoria: string;
+  descripcion?: string;
+}
 
 export interface AuditLog {
   id: string;
@@ -404,6 +426,52 @@ export const api = {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.message ?? 'Error al actualizar comprobante');
       }
+    }
+  },
+
+  egresos: {
+    getAll: async (parcelaId: string): Promise<Egreso[]> => {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_URL}/api/v1/parcelas/${parcelaId}/egresos`, { headers });
+      if (!res.ok) throw new Error('Error al obtener egresos');
+      const json = await res.json();
+      return json.data as Egreso[];
+    },
+    create: async (parcelaId: string, input: EgresoInput): Promise<Egreso> => {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_URL}/api/v1/parcelas/${parcelaId}/egresos`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(input),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message ?? 'Error al crear egreso');
+      }
+      const json = await res.json();
+      return json.data as Egreso;
+    },
+    update: async (parcelaId: string, id: string, input: EgresoInput): Promise<Egreso> => {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_URL}/api/v1/parcelas/${parcelaId}/egresos/${id}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(input),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message ?? 'Error al actualizar egreso');
+      }
+      const json = await res.json();
+      return json.data as Egreso;
+    },
+    delete: async (parcelaId: string, id: string): Promise<void> => {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_URL}/api/v1/parcelas/${parcelaId}/egresos/${id}`, {
+        method: 'DELETE',
+        headers,
+      });
+      if (!res.ok) throw new Error('Error al eliminar egreso');
     }
   },
 
