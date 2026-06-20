@@ -10,10 +10,9 @@ export const generateReceipt = async (abono: Abono) => {
   try {
     // We need to fetch the plan and terreno if possible to get exact numbers.
     // If not, we will just use placeholders or 0.
-    const [planes, terrenos, periodos] = await Promise.all([
+    const [planes, terrenos] = await Promise.all([
       api.planesPago.getAll(),
-      api.terrenos.getAll(),
-      api.planesPago.getPeriodos('all').catch(() => []) // we might not have this endpoint
+      api.terrenos.getAll()
     ]);
     
     // We try to find the plan associated with this terreno
