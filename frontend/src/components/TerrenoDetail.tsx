@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Banknote, Calendar, CheckCircle2, AlertTriangle, ExternalLink, Loader2, PlusCircle, Upload } from 'lucide-react';
-import { api, type Terreno, type PlanPago, type Abono } from '../lib/api';
+import { ArrowLeft, Banknote, Calendar, CheckCircle2, AlertTriangle, ExternalLink, Loader2, PlusCircle, Upload, FileText } from 'lucide-react';
+import { api, type Terreno, type PlanPago, type Abono, type Cliente } from '../lib/api';
+import { generateReceipt } from '../lib/pdfGenerator';
 import NewPaymentModal from './NewPaymentModal';
 import ErrorBoundary from './ErrorBoundary';
 
@@ -12,6 +13,7 @@ interface TerrenoDetailProps {
 const TerrenoDetail: React.FC<TerrenoDetailProps> = ({ terrenoId, onBack }) => {
   const [terreno, setTerreno] = useState<Terreno | null>(null);
   const [plan, setPlan] = useState<PlanPago | null>(null);
+  const [cliente, setCliente] = useState<Cliente | null>(null);
   const [abonos, setAbonos] = useState<Abono[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -77,14 +79,22 @@ const TerrenoDetail: React.FC<TerrenoDetailProps> = ({ terrenoId, onBack }) => {
   const fetchData = async () => {
       try {
         setLoading(true);
-        const [terrenosData, planesData] = await Promise.all([
+        const [terrenosData, planesData, clientesData] = await Promise.all([
           api.terrenos.getAll(),
-          api.planesPago.getAll()
+          api.planesPago.getAll(),
+          api.clientes.getAll()
         ]);
 
         const currentTerreno = terrenosData.find(t => t.id === terrenoId);
         if (!currentTerreno) throw new Error('Terreno no encontrado');
         setTerreno(currentTerreno);
+        
+        if (currentTerreno.propietario) {
+          const currentCliente = clientesData.find(c => c.nombre_completo === currentTerreno.propietario);
+          if (currentCliente) {
+            setCliente(currentCliente);
+          }
+        }
 
         const currentPlan = planesData.find(p => p.terreno_id === terrenoId);
         if (currentPlan) {
@@ -301,6 +311,15 @@ const TerrenoDetail: React.FC<TerrenoDetailProps> = ({ terrenoId, onBack }) => {
                         ) : (
                           <div className="flex justify-end items-center gap-2">
                             <span className="text-sm text-neutral-400 italic mr-2">Sin comprobante</span>
+                            
+                            <button 
+                              onClick={() => generateReceipt({ ...a, terreno_clave: terreno.clave, cliente_nombre: cliente?.nombre_completo || terreno.propietario || '' })}
+                              className="inline-flex items-center justify-center gap-1 px-2 py-1.5 text-xs font-medium text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors border border-orange-200"
+                              title="Generar Recibo PDF"
+                            >
+                              <FileText size={14} />
+                              Generar
+                            </button>
                             {uploadingAbonoId === a.id ? (
                               <Loader2 size={16} className="animate-spin text-orange-500" />
                             ) : (
