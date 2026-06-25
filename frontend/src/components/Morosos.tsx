@@ -59,7 +59,7 @@ const Morosos: React.FC<MorososProps> = ({ onBack, onViewTerreno }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {(morosos || []).map(debt => (
                   <div 
-                    key={debt.id} 
+                    key={debt.plan_id} 
                     onClick={() => onViewTerreno && onViewTerreno(debt.terreno_id)}
                     className="p-5 rounded-xl border border-red-100 bg-red-50/30 hover:shadow-md hover:-translate-y-0.5 hover:bg-red-50/80 transition-all cursor-pointer"
                   >
@@ -71,18 +71,13 @@ const Morosos: React.FC<MorososProps> = ({ onBack, onViewTerreno }) => {
                       <span className="bg-red-100 text-red-700 text-xs font-bold px-3 py-1.5 rounded-md">{debt.dias_retraso} días</span>
                     </div>
                     
-                    <div className="mt-4 pt-4 border-t border-red-100/50 flex justify-between items-end">
-                      <div className="flex flex-col">
-                        <span className="text-xs text-neutral-500 uppercase tracking-wider mb-1">Monto Esperado</span>
-                        <span className="text-lg font-black text-red-600">
-                          ${debt.monto_esperado.toLocaleString(undefined, {minimumFractionDigits: 2})}
-                        </span>
-                      </div>
-                      <div className="text-right">
-                         <span className="text-sm font-semibold text-red-800">
-                          Periodo {debt.numero_periodo}
-                        </span>
-                      </div>
+                    <div className="mt-4 pt-4 border-t border-red-100/50 flex flex-col justify-between">
+                      <span className="text-xs text-neutral-500 uppercase tracking-wider mb-1">Último abono registrado</span>
+                      <span className="text-lg font-black text-red-600">
+                        {debt.ultimo_abono_fecha 
+                          ? new Date(debt.ultimo_abono_fecha).toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' }) 
+                          : 'Sin abonos previos'}
+                      </span>
                     </div>
                   </div>
                 ))}

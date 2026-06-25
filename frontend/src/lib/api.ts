@@ -160,11 +160,8 @@ export interface ClienteMoroso {
   plan_id: string;
   terreno_id: string;
   terreno_clave: string;
-  periodo_id: string;
-  numero_periodo: number;
-  monto_esperado: number;
-  fecha_vencimiento: string;
   dias_retraso: number;
+  ultimo_abono_fecha: string | null;
 }
 
 // ─── API ──────────────────────────────────────────────────────────────────────
@@ -425,6 +422,31 @@ export const api = {
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.message ?? 'Error al actualizar comprobante');
+      }
+    },
+    update: async (id: string, input: Partial<AbonoInput>): Promise<Abono> => {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_URL}/api/v1/abonos/${id}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(input),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message ?? 'Error al actualizar abono');
+      }
+      const json = await res.json();
+      return json.data as Abono;
+    },
+    delete: async (id: string): Promise<void> => {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_URL}/api/v1/abonos/${id}`, {
+        method: 'DELETE',
+        headers,
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message ?? 'Error al eliminar abono');
       }
     }
   },

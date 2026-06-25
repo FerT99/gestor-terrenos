@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Banknote, Calendar, CheckCircle2, AlertTriangle, ExternalLink, Loader2, PlusCircle, Upload, FileText } from 'lucide-react';
+import { ArrowLeft, Banknote, Calendar, CheckCircle2, AlertTriangle, ExternalLink, Loader2, PlusCircle, Upload, FileText, Pencil, Trash2 } from 'lucide-react';
 import { api, type Terreno, type PlanPago, type Abono, type Cliente } from '../lib/api';
 import { generateReceipt } from '../lib/pdfGenerator';
 import NewPaymentModal from './NewPaymentModal';
+import EditPaymentModal from './EditPaymentModal';
 import ErrorBoundary from './ErrorBoundary';
 
 interface TerrenoDetailProps {
@@ -18,6 +19,7 @@ const TerrenoDetail: React.FC<TerrenoDetailProps> = ({ terrenoId, onBack }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [editingAbono, setEditingAbono] = useState<Abono | null>(null);
   const [uploadingAbonoId, setUploadingAbonoId] = useState<string | null>(null);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, abonoId: string) => {
@@ -33,6 +35,16 @@ const TerrenoDetail: React.FC<TerrenoDetailProps> = ({ terrenoId, onBack }) => {
       alert(err.message || 'Error al subir el comprobante');
     } finally {
       setUploadingAbonoId(null);
+    }
+  };
+
+  const handleDeleteAbono = async (abonoId: string) => {
+    if (!window.confirm('¿Estás seguro de que deseas eliminar este abono? Esta acción no se puede deshacer.')) return;
+    try {
+      await api.abonos.delete(abonoId);
+      fetchData();
+    } catch (err: any) {
+      alert(err.message || 'Error al eliminar el abono');
     }
   };
 
@@ -103,12 +115,11 @@ const TerrenoDetail: React.FC<TerrenoDetailProps> = ({ terrenoId, onBack }) => {
           // Get periodos to know which abonos belong to this plan
           const periodosData = await api.planesPago.getPeriodos(currentPlan.id);
           
-          // Fetch abonos para cada periodo individualmente
-          const abonosPromises = periodosData.map(p => api.abonos.getByPeriodo(p.id));
-          const abonosResults = await Promise.all(abonosPromises);
+          // Fetch all abonos once to avoid database connection limits
+          const todosLosAbonos = await api.abonos.getAll();
+          const periodosIds = periodosData.map(p => p.id);
+          const filteredAbonos = todosLosAbonos.filter(a => periodosIds.includes(a.periodo_pago_id));
           
-          // Flatten, filter nulls, and sort
-          const filteredAbonos = abonosResults.flat().filter(a => a != null);
           filteredAbonos.sort((a, b) => (a.numero_abono || 0) - (b.numero_abono || 0));
           setAbonos(filteredAbonos);
         }
@@ -277,6 +288,7 @@ const TerrenoDetail: React.FC<TerrenoDetailProps> = ({ terrenoId, onBack }) => {
                     <th className="px-6 py-4 text-xs font-bold text-neutral-500 uppercase tracking-wider">Fecha de Pago</th>
                     <th className="px-6 py-4 text-xs font-bold text-neutral-500 uppercase tracking-wider">Monto ($)</th>
                     <th className="px-6 py-4 text-xs font-bold text-neutral-500 uppercase tracking-wider text-right">Comprobante</th>
+                    <th className="px-6 py-4 text-xs font-bold text-neutral-500 uppercase tracking-wider text-right">Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-100">
@@ -337,6 +349,24 @@ const TerrenoDetail: React.FC<TerrenoDetailProps> = ({ terrenoId, onBack }) => {
                           </div>
                         )}
                       </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex justify-end gap-2">
+                          <button 
+                            onClick={() => setEditingAbono(a)}
+                            className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            title="Editar Abono"
+                          >
+                            <Pencil size={16} />
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteAbono(a.id)}
+                            className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Eliminar Abono"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -360,6 +390,14 @@ const TerrenoDetail: React.FC<TerrenoDetailProps> = ({ terrenoId, onBack }) => {
             initialPlanId={plan.id}
           />
         </ErrorBoundary>
+      )}
+
+      {editingAbono && (
+        <EditPaymentModal 
+          abono={editingAbono} 
+          onClose={() => setEditingAbono(null)} 
+          onSuccess={() => { setEditingAbono(null); fetchData(); }} 
+        />
       )}
     </div>
   );
