@@ -162,6 +162,7 @@ export interface ClienteMoroso {
   terreno_clave: string;
   dias_retraso: number;
   ultimo_abono_fecha: string | null;
+  numero_periodo?: number;
 }
 
 // ─── API ──────────────────────────────────────────────────────────────────────
