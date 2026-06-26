@@ -18,6 +18,11 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
     headers['X-User-Role'] = userRole;
   }
   
+  const userName = localStorage.getItem('user_name');
+  if (userName) {
+    headers['X-User-Name'] = userName;
+  }
+  
   const parcelaId = localStorage.getItem('selected_parcela');
   if (parcelaId) {
     headers['X-Parcela-Id'] = parcelaId;

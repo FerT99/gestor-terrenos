@@ -9,8 +9,17 @@ const AuditLogViewer = () => {
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const data = await api.auditLogs.getAll();
-        setLogs(data || []);
+        const [data, me] = await Promise.all([
+          api.auditLogs.getAll(),
+          api.usuarios.getMe().catch(() => null)
+        ]);
+        
+        if (data && me) {
+          // Filtrar logs para no mostrar los del propio admin actual ni los antiguos hardcodeados
+          setLogs(data.filter(log => log.usuario_nombre !== me.nombre && log.usuario_nombre !== 'Administrador'));
+        } else {
+          setLogs(data || []);
+        }
       } catch (err) {
         console.error("Error cargando audit logs", err);
       } finally {

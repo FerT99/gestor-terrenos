@@ -23,7 +23,7 @@ function App() {
   const [globalSearch, setGlobalSearch] = React.useState('');
   const [selectedTerrenoId, setSelectedTerrenoId] = React.useState<string | null>(null);
   const [selectedClienteId, setSelectedClienteId] = React.useState<string | null>(null);
-  const [viewHistory, setViewHistory] = React.useState<string[]>([]);
+  const [, setViewHistory] = React.useState<string[]>([]);
 
   const handleNavigate = (view: string) => {
     if (view !== currentView) {
@@ -61,10 +61,10 @@ function App() {
         return;
       }
 
-      // 1. Obtener el perfil del usuario (y su rol)
       try {
         const perfil = await api.usuarios.getMe();
         localStorage.setItem('user_role', perfil.rol);
+        localStorage.setItem('user_name', perfil.nombre);
       } catch (err) {
         console.error("Error al obtener perfil, asumiendo rol vendedor", err);
         localStorage.setItem('user_role', 'vendedor'); // Default seguro

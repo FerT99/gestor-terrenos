@@ -4,7 +4,6 @@ import {
   Wallet, 
   AlertTriangle, 
   Calendar, 
-  Filter, 
   Banknote,
   FileText
 } from 'lucide-react';
@@ -68,7 +67,8 @@ const Payments: React.FC<PaymentsProps> = ({ onViewMorosos }) => {
   }, 0);
   
   const totalEgresos = (egresos || []).reduce((acc, curr) => acc + (Number(curr.monto) || 0), 0);
-  const utilidadNeta = totalCobros - totalEgresos;
+  const comisiones = totalCobros * 0.0675;
+  const utilidadNeta = totalCobros - totalEgresos - comisiones;
 
 
   return (
@@ -149,6 +149,10 @@ const Payments: React.FC<PaymentsProps> = ({ onViewMorosos }) => {
             <div className="flex justify-between items-center border-b border-blue-200/50 pb-2">
               <span className="text-sm font-semibold text-blue-800">Ingresos Brutos</span>
               <span className="text-base font-black text-blue-900">${totalCobros.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+            </div>
+            <div className="flex justify-between items-center border-b border-blue-200/50 pb-2">
+              <span className="text-sm font-semibold text-red-600">Comisiones (6.75%)</span>
+              <span className="text-base font-black text-red-600">-${comisiones.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
             </div>
             <div className="flex justify-between items-center border-b border-blue-200/50 pb-2">
               <span className="text-sm font-semibold text-red-600">Egresos Registrados</span>

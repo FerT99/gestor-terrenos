@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CheckCircle2, Wallet, AlertTriangle, Loader2 } from 'lucide-react';
+import { Wallet, AlertTriangle, Loader2 } from 'lucide-react';
 import RevenueChart from './RevenueChart';
 import AuditLogViewer from './AuditLogViewer';
 import MonthlyPaymentsModal from './MonthlyPaymentsModal';
@@ -59,8 +59,6 @@ const Dashboard: React.FC<DashboardProps> = ({ onViewMorosos }) => {
     );
   }
 
-  // Calculate Lotes Vendidos
-  const lotesVendidos = terrenos.filter(t => t.estado.toLowerCase() === 'vendido').length;
 
   // Calculate Ingresos of current month and all time
   const currentMonth = new Date().getMonth();

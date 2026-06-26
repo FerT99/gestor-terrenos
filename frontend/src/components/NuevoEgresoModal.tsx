@@ -20,6 +20,9 @@ const NuevoEgresoModal: React.FC<NuevoEgresoModalProps> = ({ isOpen, onClose, on
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [moneda, setMoneda] = useState('MXN');
+  const [tipoCambio, setTipoCambio] = useState<number | ''>('');
+  const [isFetchingExchange, setIsFetchingExchange] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -33,10 +36,27 @@ const NuevoEgresoModal: React.FC<NuevoEgresoModalProps> = ({ isOpen, onClose, on
         });
       } else {
         setForm(EMPTY_FORM);
+        setMoneda('MXN');
+        setTipoCambio('');
       }
       setError(null);
     }
   }, [isOpen, initialData]);
+
+  useEffect(() => {
+    if (moneda === 'USD' && tipoCambio === '') {
+      setIsFetchingExchange(true);
+      fetch('https://api.exchangerate-api.com/v4/latest/USD')
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.rates && data.rates.MXN) {
+            setTipoCambio(data.rates.MXN);
+          }
+        })
+        .catch(err => console.error("Error fetching exchange rate:", err))
+        .finally(() => setIsFetchingExchange(false));
+    }
+  }, [moneda]);
 
   if (!isOpen) return null;
 
@@ -53,11 +73,24 @@ const NuevoEgresoModal: React.FC<NuevoEgresoModalProps> = ({ isOpen, onClose, on
     setSaving(true);
     setError(null);
     try {
+      let finalMonto = Number(form.monto);
+      let finalDesc = form.descripcion;
+
+      if (moneda === 'USD') {
+        const tc = Number(tipoCambio) || 1;
+        finalMonto = Number(form.monto) * tc;
+        const extraNote = `(Ingresado como $${Number(form.monto).toLocaleString('en-US', {minimumFractionDigits: 2})} USD, TC: $${tc})`;
+        finalDesc = finalDesc ? `${finalDesc} \n${extraNote}` : extraNote;
+      }
+
       await onSubmit({
         ...form,
-        monto: Number(form.monto)
+        monto: finalMonto,
+        descripcion: finalDesc
       });
       setForm(EMPTY_FORM);
+      setMoneda('MXN');
+      setTipoCambio('');
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al guardar');
@@ -128,6 +161,52 @@ const NuevoEgresoModal: React.FC<NuevoEgresoModalProps> = ({ isOpen, onClose, on
               </select>
             </div>
           </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-neutral-700">Moneda</label>
+              <select 
+                value={moneda}
+                onChange={(e) => {
+                  setMoneda(e.target.value);
+                  if (e.target.value !== 'USD') setTipoCambio('');
+                }}
+                className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+              >
+                <option value="MXN">MXN - Pesos Mexicanos</option>
+                <option value="USD">USD - Dólares</option>
+              </select>
+            </div>
+            
+            {moneda === 'USD' && (
+              <div className="space-y-1.5 animate-in fade-in duration-200">
+                <label className="text-sm font-medium text-neutral-700 flex items-center justify-between">
+                  <span>Tipo de Cambio (MXN)</span>
+                  {isFetchingExchange && <span className="text-xs text-neutral-400">Actualizando...</span>}
+                </label>
+                <div className="flex items-center gap-2">
+                  <span className="text-neutral-500 font-medium px-1">$</span>
+                  <input 
+                    type="number"
+                    min="0"
+                    step="0.0001"
+                    value={tipoCambio}
+                    onChange={(e) => setTipoCambio(e.target.value === '' ? '' : Number(e.target.value))}
+                    className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+          
+          {moneda === 'USD' && tipoCambio !== '' && form.monto !== '' && (
+            <div className="mb-5 p-4 bg-orange-50 rounded-xl border border-orange-100 flex items-center justify-between text-sm">
+              <span className="text-neutral-600">Equivalente en Pesos:</span>
+              <span className="font-bold text-orange-700">
+                ${(Number(form.monto) * Number(tipoCambio)).toLocaleString('es-MX', {minimumFractionDigits: 2})} MXN
+              </span>
+            </div>
+          )}
 
           <div className="space-y-1.5 mb-5">
             <label htmlFor="descripcion" className="text-sm font-medium text-neutral-700">Descripción (opcional)</label>
