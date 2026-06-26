@@ -3,7 +3,7 @@ import { Wallet, AlertTriangle, Loader2 } from 'lucide-react';
 import RevenueChart from './RevenueChart';
 import AuditLogViewer from './AuditLogViewer';
 import MonthlyPaymentsModal from './MonthlyPaymentsModal';
-import { api, type Abono, type Terreno, type ClienteMoroso, type Egreso } from '../lib/api';
+import { api, type Abono, type ClienteMoroso, type Egreso } from '../lib/api';
 
 interface DashboardProps {
   onViewMorosos?: () => void;
@@ -11,7 +11,7 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({ onViewMorosos }) => {
   const [abonos, setAbonos] = useState<Abono[]>([]);
-  const [terrenos, setTerrenos] = useState<Terreno[]>([]);
+
   const [morosos, setMorosos] = useState<ClienteMoroso[]>([]);
   const [egresos, setEgresos] = useState<Egreso[]>([]);
   const [exchangeRate, setExchangeRate] = useState<number>(0);
@@ -22,14 +22,12 @@ const Dashboard: React.FC<DashboardProps> = ({ onViewMorosos }) => {
     const fetchMetrics = async () => {
       try {
         const parcelaId = localStorage.getItem('selected_parcela') || '';
-        const [abonosData, terrenosData, morososData, egresosData] = await Promise.all([
+        const [abonosData, morososData, egresosData] = await Promise.all([
           api.abonos.getAll(),
-          api.terrenos.getAll(),
           api.reportes.getMorosos(),
           parcelaId ? api.egresos.getAll(parcelaId) : Promise.resolve([]),
         ]);
         setAbonos(abonosData || []);
-        setTerrenos(terrenosData || []);
         setMorosos(morososData || []);
         setEgresos(egresosData || []);
       } catch (err) {

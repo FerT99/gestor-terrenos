@@ -204,7 +204,8 @@ export interface AuditLog {
 export interface Usuario {
   id: string;
   email: string;
-  nombre_completo: string;
+  nombre_completo?: string;
+  nombre: string;
   rol: string;
   created_at: string;
 }
