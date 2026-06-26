@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { CheckCircle2, Wallet, AlertTriangle, Loader2 } from 'lucide-react';
-import SummaryCard from './SummaryCard';
 import RevenueChart from './RevenueChart';
 import AuditLogViewer from './AuditLogViewer';
 import MonthlyPaymentsModal from './MonthlyPaymentsModal';
@@ -63,26 +62,35 @@ const Dashboard: React.FC<DashboardProps> = ({ onViewMorosos }) => {
   // Calculate Lotes Vendidos
   const lotesVendidos = terrenos.filter(t => t.estado.toLowerCase() === 'vendido').length;
 
-  // Calculate Ingresos of current month
+  // Calculate Ingresos of current month and all time
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
   let mxnSum = 0;
   let efectivoSum = 0;
   let transferenciaSum = 0;
+  let ingresosTotalesHistorico = 0;
 
   abonos.forEach(abono => {
-    const date = new Date(abono.fecha_pago);
-    if (date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
-      let mxnValue = abono.monto_pagado;
-      if (abono.moneda === 'USD') {
-        const rate = abono.tipo_cambio || exchangeRate || 18;
-        mxnValue = abono.monto_pagado * rate;
-      }
+    let mxnValue = abono.monto_pagado;
+    if (abono.moneda === 'USD') {
+      const rate = abono.tipo_cambio || exchangeRate || 18;
+      mxnValue = abono.monto_pagado * rate;
+    }
+
+    ingresosTotalesHistorico += mxnValue;
+
+    // Evitar problemas de zona horaria extrayendo el año y mes directamente del string YYYY-MM-DD
+    const [yearStr, monthStr] = abono.fecha_pago.split('T')[0].split('-');
+    const abonoYear = parseInt(yearStr, 10);
+    const abonoMonth = parseInt(monthStr, 10) - 1; // 0-indexed para que coincida con getMonth()
+
+    if (abonoMonth === currentMonth && abonoYear === currentYear) {
       mxnSum += mxnValue;
 
-      if (abono.metodo_pago?.toLowerCase() === 'efectivo') {
+      const metodo = abono.metodo_pago?.trim().toLowerCase();
+      if (metodo === 'efectivo') {
         efectivoSum += mxnValue;
-      } else if (abono.metodo_pago?.toLowerCase() === 'transferencia') {
+      } else if (metodo === 'transferencia') {
         transferenciaSum += mxnValue;
       }
     }
@@ -90,101 +98,116 @@ const Dashboard: React.FC<DashboardProps> = ({ onViewMorosos }) => {
 
   let egresosMes = 0;
   egresos.forEach(egreso => {
-    // Si la fecha viene en formato YYYY-MM-DD
-    const date = new Date(egreso.fecha);
-    // Para asegurarnos de que la conversión no falle por zonas horarias y nos dé el mes correcto
-    // podemos usar substring o los métodos normales.
-    // Usamos métodos normales pero asegurando que es válido:
-    if (!isNaN(date.getTime()) && date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
-      egresosMes += Number(egreso.monto) || 0;
+    const [yearStr, monthStr] = egreso.fecha.split('T')[0].split('-');
+    if (yearStr && monthStr) {
+      const egresoYear = parseInt(yearStr, 10);
+      const egresoMonth = parseInt(monthStr, 10) - 1;
+      
+      if (egresoMonth === currentMonth && egresoYear === currentYear) {
+        egresosMes += Number(egreso.monto) || 0;
+      }
     }
   });
 
   const utilidadNetaMes = mxnSum - egresosMes;
+  const comisionesHistorico = ingresosTotalesHistorico * 0.0675;
+  const ingresosNetosHistorico = ingresosTotalesHistorico - comisionesHistorico;
 
   // Calculate Adeudos Vencidos
   const overdueCount = morosos.length;
 
   return (
-    <main className="p-6 md:p-10 max-w-7xl mx-auto space-y-8">
+    <main className="p-6 md:p-10 max-w-7xl mx-auto space-y-6">
       <div>
         <h2 className="text-3xl font-bold tracking-tight text-neutral-900">Panel Inicial</h2>
-        <p className="text-neutral-500 mt-1">Métricas de rendimiento y alertas del periodo actual.</p>
+        <p className="text-neutral-500 mt-1">Resumen del rendimiento y alertas de este mes.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <SummaryCard 
-          title="Lotes Vendidos" 
-          value={lotesVendidos} 
-          subtitle="Total acumulado" 
-          icon={<CheckCircle2 size={18} />} 
-          variant="green"
-        />
-        <SummaryCard 
-          title="Ingresos Brutos (Mes)" 
-          value={`$${mxnSum.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`} 
-          subtitle={exchangeRate ? `≈ USD: $${(mxnSum / exchangeRate).toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '...'} 
-          icon={<Wallet size={18} />} 
-        />
-        <SummaryCard 
-          title="Utilidad Neta (Mes)" 
-          value={`$${utilidadNetaMes.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`} 
-          subtitle={exchangeRate ? `≈ USD: $${(utilidadNetaMes / exchangeRate).toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '...'} 
-          icon={<Wallet size={18} />} 
-          variant="green"
-        />
-        <SummaryCard 
-          title="Adeudos Vencidos" 
-          value={overdueCount} 
-          subtitle="Pagos atrasados" 
-          icon={<AlertTriangle size={18} />} 
-          isAlert={overdueCount > 0} 
+
+
+      {/* 2. Métrica hero grande y centrada */}
+      <div className="bg-white rounded-[2rem] p-8 md:p-12 shadow-sm border border-neutral-100 flex flex-col items-center justify-center text-center">
+        <span className="text-neutral-400 font-bold mb-3 uppercase tracking-[0.2em] text-xs md:text-sm">Ingresos del Mes</span>
+        <h3 className="text-6xl md:text-8xl font-black text-neutral-900 tracking-tighter">
+          ${mxnSum.toLocaleString('es-MX', { minimumFractionDigits: 0 })}
+        </h3>
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          {exchangeRate ? (
+            <span className="text-neutral-500 font-medium bg-neutral-50 border border-neutral-100 px-4 py-2 rounded-full text-sm">
+              ≈ USD ${(mxnSum / exchangeRate).toLocaleString('en-US', { minimumFractionDigits: 0 })}
+            </span>
+          ) : null}
+          <span className="text-emerald-700 font-medium bg-emerald-50 border border-emerald-100 px-4 py-2 rounded-full text-sm">
+            Utilidad Neta: ${utilidadNetaMes.toLocaleString('es-MX', {minimumFractionDigits: 0})}
+          </span>
+        </div>
+      </div>
+
+      {/* 3. Fila de KPIs secundarios compacta */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-neutral-100 flex flex-col justify-center">
+          <div className="flex items-center gap-2 mb-2">
+            <Wallet size={16} className="text-neutral-400" />
+            <span className="text-neutral-500 text-xs font-bold uppercase tracking-wider">Total Histórico</span>
+          </div>
+          <span className="text-2xl md:text-3xl font-black text-neutral-800">${ingresosTotalesHistorico.toLocaleString('es-MX', {minimumFractionDigits: 0})}</span>
+          <span className="text-xs text-neutral-500 font-medium mt-1">Neto: ${ingresosNetosHistorico.toLocaleString('es-MX', {minimumFractionDigits: 0})}</span>
+        </div>
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-neutral-100 flex flex-col justify-center">
+          <div className="flex items-center gap-2 mb-2">
+            <Wallet size={16} className="text-neutral-400" />
+            <span className="text-neutral-500 text-xs font-bold uppercase tracking-wider">Efectivo (Mes)</span>
+          </div>
+          <span className="text-3xl font-black text-neutral-800">${efectivoSum.toLocaleString('es-MX', {minimumFractionDigits: 0})}</span>
+        </div>
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-neutral-100 flex flex-col justify-center">
+          <div className="flex items-center gap-2 mb-2">
+            <Wallet size={16} className="text-neutral-400" />
+            <span className="text-neutral-500 text-xs font-bold uppercase tracking-wider">Transferencias (Mes)</span>
+          </div>
+          <span className="text-3xl font-black text-neutral-800">${transferenciaSum.toLocaleString('es-MX', {minimumFractionDigits: 0})}</span>
+        </div>
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-neutral-100 flex flex-col justify-center">
+          <div className="flex items-center gap-2 mb-2">
+            <Wallet size={16} className="text-neutral-400" />
+            <span className="text-neutral-500 text-xs font-bold uppercase tracking-wider">Egresos (Mes)</span>
+          </div>
+          <span className="text-3xl font-black text-neutral-800">${egresosMes.toLocaleString('es-MX', {minimumFractionDigits: 0})}</span>
+        </div>
+      </div>
+
+      {/* Alerta movida abajo con colores más suaves */}
+      {overdueCount > 0 && (
+        <div 
           onClick={onViewMorosos}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white rounded-2xl shadow-sm border border-neutral-200 p-6 flex items-center justify-between hover:shadow-md transition-shadow">
+          className="bg-red-50 hover:bg-red-100 border border-red-200 cursor-pointer transition-all hover:shadow-md hover:-translate-y-0.5 text-red-900 rounded-2xl p-4 flex items-center justify-between shadow-sm"
+        >
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600">
-              <Wallet size={24} />
+            <div className="bg-red-100 p-2.5 rounded-full flex-shrink-0">
+              <AlertTriangle size={24} className="text-red-600" />
             </div>
             <div>
-              <p className="text-sm text-neutral-500 font-medium mb-1">Ingresos en Efectivo (Mes)</p>
-              <h3 className="text-2xl font-black text-neutral-900">${efectivoSum.toLocaleString('es-MX', {minimumFractionDigits: 2})}</h3>
+              <h3 className="font-bold text-lg md:text-xl">Atención: {overdueCount} adeudos vencidos</h3>
+              <p className="text-red-700 text-sm md:text-base mt-0.5">La acción más importante de hoy es revisar y gestionar estas cuentas atrasadas.</p>
             </div>
           </div>
-          <div className="text-right hidden sm:block">
-            <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Equiv. USD</p>
-            <p className="text-sm font-medium text-neutral-600">{exchangeRate ? `≈ $${(efectivoSum / exchangeRate).toLocaleString('en-US', {minimumFractionDigits: 2})}` : '...'}</p>
+          <div className="hidden md:flex bg-red-100 text-red-700 p-2 rounded-full flex-shrink-0 border border-red-200">
+            <span className="text-sm font-bold px-2">Revisar</span>
           </div>
         </div>
+      )}
 
-        <div className="bg-white rounded-2xl shadow-sm border border-neutral-200 p-6 flex items-center justify-between hover:shadow-md transition-shadow">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
-              <Wallet size={24} />
-            </div>
-            <div>
-              <p className="text-sm text-neutral-500 font-medium mb-1">Ingresos por Transferencia</p>
-              <h3 className="text-2xl font-black text-neutral-900">${transferenciaSum.toLocaleString('es-MX', {minimumFractionDigits: 2})}</h3>
-            </div>
-          </div>
-          <div className="text-right hidden sm:block">
-            <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Equiv. USD</p>
-            <p className="text-sm font-medium text-neutral-600">{exchangeRate ? `≈ $${(transferenciaSum / exchangeRate).toLocaleString('en-US', {minimumFractionDigits: 2})}` : '...'}</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="w-full">
+      {/* 4. Gráfica de Ingresos Mensuales */}
+      <div className="w-full pt-4">
         <RevenueChart 
           abonos={abonos} 
           onMonthClick={(month, year) => setSelectedMonthDetails({ month, year })}
         />
       </div>
 
-      <AuditLogViewer />
+      <div className="pt-4">
+        <AuditLogViewer />
+      </div>
 
       <MonthlyPaymentsModal 
         isOpen={selectedMonthDetails !== null}

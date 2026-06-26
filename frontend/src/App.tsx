@@ -23,6 +23,32 @@ function App() {
   const [globalSearch, setGlobalSearch] = React.useState('');
   const [selectedTerrenoId, setSelectedTerrenoId] = React.useState<string | null>(null);
   const [selectedClienteId, setSelectedClienteId] = React.useState<string | null>(null);
+  const [viewHistory, setViewHistory] = React.useState<string[]>([]);
+
+  const handleNavigate = (view: string) => {
+    if (view !== currentView) {
+      setViewHistory(prev => [...prev, currentView]);
+      setCurrentView(view);
+    }
+  };
+
+  const handleSidebarNavigate = (view: string) => {
+    setViewHistory([]);
+    setCurrentView(view);
+  };
+
+  const handleGoBack = (fallback: string) => {
+    setViewHistory(prev => {
+      const newHistory = [...prev];
+      const previous = newHistory.pop();
+      if (previous) {
+        setCurrentView(previous);
+      } else {
+        setCurrentView(fallback);
+      }
+      return newHistory;
+    });
+  };
 
   React.useEffect(() => {
     setGlobalSearch('');
@@ -100,20 +126,20 @@ function App() {
     <div className="flex h-screen w-screen overflow-hidden bg-neutral-50 font-sans text-neutral-900">
       <Sidebar 
         currentView={currentView} 
-        setCurrentView={setCurrentView} 
+        setCurrentView={handleSidebarNavigate} 
         onLogout={signOut} 
         onNewSale={() => setShowNewSaleModal(true)} 
       />
       <div className="flex-1 flex flex-col h-screen overflow-hidden relative">
         <Header currentView={currentView} searchQuery={globalSearch} onSearchChange={setGlobalSearch} />
         <div className="flex-1 overflow-y-auto">
-          {currentView === 'dashboard' && <Dashboard onViewMorosos={() => setCurrentView('morosos')} />}
+          {currentView === 'dashboard' && <Dashboard onViewMorosos={() => handleNavigate('morosos')} />}
           {currentView === 'catalog' && (
             <LandCatalog 
               searchQuery={globalSearch} 
               onSelectTerreno={(id) => {
                 setSelectedTerrenoId(id);
-                setCurrentView('terreno_detail');
+                handleNavigate('terreno_detail');
               }} 
             />
           )}
@@ -122,7 +148,7 @@ function App() {
               terrenoId={selectedTerrenoId} 
               onBack={() => {
                 setSelectedTerrenoId(null);
-                setCurrentView('catalog');
+                handleGoBack('catalog');
               }} 
             />
           )}
@@ -131,7 +157,7 @@ function App() {
               searchQuery={globalSearch} 
               onSelectCliente={(id) => {
                 setSelectedClienteId(id);
-                setCurrentView('client_detail');
+                handleNavigate('client_detail');
               }}
             />
           )}
@@ -140,21 +166,21 @@ function App() {
               clienteId={selectedClienteId} 
               onBack={() => {
                 setSelectedClienteId(null);
-                setCurrentView('clients');
+                handleGoBack('clients');
               }} 
               onViewTerreno={(terrenoId) => {
                 setSelectedTerrenoId(terrenoId);
-                setCurrentView('terreno_detail');
+                handleNavigate('terreno_detail');
               }}
             />
           )}
-          {currentView === 'payments' && <Payments onViewMorosos={() => setCurrentView('morosos')} />}
+          {currentView === 'payments' && <Payments onViewMorosos={() => handleNavigate('morosos')} />}
           {currentView === 'morosos' && (
             <Morosos 
-              onBack={() => setCurrentView('payments')} 
+              onBack={() => handleGoBack('payments')} 
               onViewTerreno={(terrenoId) => {
                 setSelectedTerrenoId(terrenoId);
-                setCurrentView('terreno_detail');
+                handleNavigate('terreno_detail');
               }}
             />
           )}

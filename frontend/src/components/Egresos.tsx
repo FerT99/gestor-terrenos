@@ -48,6 +48,7 @@ const Egresos: React.FC = () => {
     try {
       await api.egresos.delete(parcelaId, egresoToDelete.id);
       await fetchEgresos();
+      setEgresoToDelete(null); // Cerrar el modal de confirmación
     } catch (err) {
       console.error(err);
     }

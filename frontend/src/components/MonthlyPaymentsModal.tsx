@@ -16,8 +16,13 @@ const MonthlyPaymentsModal: React.FC<MonthlyPaymentsModalProps> = ({ isOpen, onC
   if (!isOpen) return null;
 
   const filteredAbonos = abonos.filter(abono => {
-    const d = new Date(abono.fecha_pago);
-    return d.getMonth() === month && d.getFullYear() === year;
+    const [yearStr, monthStr] = abono.fecha_pago.split('T')[0].split('-');
+    if (yearStr && monthStr) {
+      const abonoYear = parseInt(yearStr, 10);
+      const abonoMonth = parseInt(monthStr, 10) - 1;
+      return abonoMonth === month && abonoYear === year;
+    }
+    return false;
   }).sort((a, b) => new Date(b.fecha_pago).getTime() - new Date(a.fecha_pago).getTime());
 
   const totalMensual = filteredAbonos.reduce((acc, curr) => acc + curr.monto_pagado, 0);

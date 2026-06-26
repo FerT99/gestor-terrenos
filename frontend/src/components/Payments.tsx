@@ -165,16 +165,7 @@ const Payments: React.FC<PaymentsProps> = ({ onViewMorosos }) => {
       </div>
 
       <div className="w-full space-y-6">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <button className="flex flex-1 items-center justify-center gap-2 px-4 py-2.5 bg-white border border-neutral-200 rounded-xl text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors">
-              <Calendar size={16} className="text-neutral-400" />
-              <span>Todos los tiempos</span>
-            </button>
-            <button className="flex flex-1 items-center justify-center gap-2 px-4 py-2.5 bg-white border border-neutral-200 rounded-xl text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors">
-              <Filter size={16} className="text-neutral-400" />
-              <span>Filtros</span>
-            </button>
-          </div>
+
 
           <div className="bg-white rounded-2xl shadow-sm border border-neutral-200 overflow-hidden">
             <div className="flex items-center justify-between p-6 border-b border-neutral-100">
@@ -202,7 +193,7 @@ const Payments: React.FC<PaymentsProps> = ({ onViewMorosos }) => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-neutral-100">
-                    {(abonos || []).map(abono => (
+                    {(abonos || []).slice(0, 15).map(abono => (
                       <tr key={abono.id} className="hover:bg-neutral-50 transition-colors">
                         <td className="px-6 py-4 font-semibold text-neutral-900">
                           Abono {String(abono.numero_abono || 1).padStart(2, '0')}
@@ -248,7 +239,7 @@ const Payments: React.FC<PaymentsProps> = ({ onViewMorosos }) => {
             )}
             {!loading && (abonos?.length || 0) > 0 && (
               <div className="flex items-center justify-between px-6 py-4 border-t border-neutral-100 bg-neutral-50/50">
-                <span className="text-sm text-neutral-500">Mostrando {(abonos || []).length} abonos</span>
+                <span className="text-sm text-neutral-500">Mostrando {Math.min(15, abonos.length)} abonos recientes de {abonos.length} totales</span>
               </div>
             )}
           </div>

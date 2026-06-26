@@ -16,10 +16,14 @@ const RevenueChart: React.FC<RevenueChartProps> = ({ abonos, onMonthClick }) => 
   const monthlyValues = Array(12).fill(0);
   
   (abonos || []).forEach(abono => {
-    const date = new Date(abono.fecha_pago);
-    if (date.getFullYear() === selectedYear) {
-      const monthIndex = date.getMonth(); // 0-11
-      monthlyValues[monthIndex] += abono.monto_pagado;
+    const [yearStr, monthStr] = abono.fecha_pago.split('T')[0].split('-');
+    if (yearStr && monthStr) {
+      const abonoYear = parseInt(yearStr, 10);
+      const abonoMonth = parseInt(monthStr, 10) - 1;
+      
+      if (abonoYear === selectedYear) {
+        monthlyValues[abonoMonth] += abono.monto_pagado;
+      }
     }
   });
 

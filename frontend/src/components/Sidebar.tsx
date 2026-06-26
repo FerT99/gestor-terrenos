@@ -15,7 +15,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView, onLogout
     { id: 'dashboard', icon: LayoutDashboard, label: 'Panel Inicial' },
     { id: 'catalog', icon: Map, label: 'Catálogo de Terrenos' },
     { id: 'clients', icon: Users, label: 'Clientes' },
-    { id: 'payments', icon: CreditCard, label: 'Pagos' },
+    { id: 'payments', icon: CreditCard, label: 'Resumen Financiero' },
     { id: 'egresos', icon: Wallet, label: 'Egresos' },
   ];
 
@@ -93,8 +93,8 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView, onLogout
               href="#"
               onClick={(e) => { e.preventDefault(); setCurrentView(item.id); }}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group relative ${currentView === item.id
-                  ? 'bg-orange-50 text-orange-700 font-medium'
-                  : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900 font-medium'
+                ? 'bg-orange-50 text-orange-700 font-medium'
+                : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900 font-medium'
                 }`}
             >
               {currentView === item.id && (
