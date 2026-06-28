@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { api, type Abono, type Terreno, type PlanPago, type Egreso } from '../lib/api';
 import { generateReceipt } from '../lib/pdfGenerator';
+import { supabase } from '../lib/supabase';
 import NewPaymentModal from './NewPaymentModal';
 import ErrorBoundary from './ErrorBoundary';
 
@@ -27,17 +28,38 @@ const Payments: React.FC<PaymentsProps> = ({ onViewMorosos }) => {
 
   const fetchData = async () => {
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+      
       const parcelaId = localStorage.getItem('selected_parcela') || '';
+      const userRole = (localStorage.getItem('user_role') || '').toLowerCase();
+      
       const [abonosData, terrenosData, planesData, egresosData] = await Promise.all([
         api.abonos.getAll(),
         api.terrenos.getAll(),
         api.planesPago.getAll(),
         parcelaId ? api.egresos.getAll(parcelaId) : Promise.resolve([])
       ]);
-      setAbonos(abonosData || []);
-      setTerrenos(terrenosData || []);
-      setPlanes(planesData || []);
-      setEgresos(egresosData || []);
+      
+      let filteredAbonos = abonosData || [];
+      let filteredTerrenos = terrenosData || [];
+      let filteredPlanes = planesData || [];
+      let filteredEgresos = egresosData || [];
+
+      // Si no es administrador, filtramos para que vea solo lo suyo
+      if (userRole !== 'admin' && userId) {
+        filteredTerrenos = filteredTerrenos.filter(t => t.vendedor_id === userId);
+        const myTerrenoIds = new Set(filteredTerrenos.map(t => t.id));
+        
+        filteredAbonos = filteredAbonos.filter(a => a.terreno_id && myTerrenoIds.has(a.terreno_id));
+        filteredPlanes = filteredPlanes.filter(p => p.terreno_id && myTerrenoIds.has(p.terreno_id));
+        filteredEgresos = []; // Vendedores no ven egresos
+      }
+
+      setAbonos(filteredAbonos);
+      setTerrenos(filteredTerrenos);
+      setPlanes(filteredPlanes);
+      setEgresos(filteredEgresos);
     } catch (err) {
       console.error(err);
     } finally {

@@ -64,7 +64,7 @@ function App() {
       try {
         const perfil = await api.usuarios.getMe();
         localStorage.setItem('user_role', perfil.rol);
-        localStorage.setItem('user_name', perfil.nombre);
+        localStorage.setItem('user_name', perfil.nombre || perfil.nombre_completo || 'Usuario');
       } catch (err) {
         console.error("Error al obtener perfil, asumiendo rol vendedor", err);
         localStorage.setItem('user_role', 'vendedor'); // Default seguro
@@ -133,7 +133,7 @@ function App() {
       <div className="flex-1 flex flex-col h-screen overflow-hidden relative">
         <Header currentView={currentView} searchQuery={globalSearch} onSearchChange={setGlobalSearch} />
         <div className="flex-1 overflow-y-auto">
-          {currentView === 'dashboard' && <Dashboard onViewMorosos={() => handleNavigate('morosos')} />}
+          {currentView === 'dashboard' && <Dashboard onViewMorosos={() => handleNavigate('morosos')} onViewTerreno={(id) => { setSelectedTerrenoId(id); handleNavigate('terreno_detail'); }} />}
           {currentView === 'catalog' && (
             <LandCatalog 
               searchQuery={globalSearch} 

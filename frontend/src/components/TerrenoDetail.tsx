@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Banknote, Calendar, CheckCircle2, AlertTriangle, ExternalLink, Loader2, PlusCircle, Upload, FileText, Pencil, Trash2 } from 'lucide-react';
-import { api, type Terreno, type PlanPago, type Abono, type Cliente } from '../lib/api';
+import { api, type Terreno, type PlanPago, type Abono, type Cliente, type Usuario } from '../lib/api';
 import { generateReceipt } from '../lib/pdfGenerator';
 import NewPaymentModal from './NewPaymentModal';
 import EditPaymentModal from './EditPaymentModal';
@@ -21,6 +21,10 @@ const TerrenoDetail: React.FC<TerrenoDetailProps> = ({ terrenoId, onBack }) => {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [editingAbono, setEditingAbono] = useState<Abono | null>(null);
   const [uploadingAbonoId, setUploadingAbonoId] = useState<string | null>(null);
+  
+  const [vendedores, setVendedores] = useState<Usuario[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isUpdatingVendedor, setIsUpdatingVendedor] = useState(false);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, abonoId: string) => {
     const file = e.target.files?.[0];
@@ -124,6 +128,17 @@ const TerrenoDetail: React.FC<TerrenoDetailProps> = ({ terrenoId, onBack }) => {
           setAbonos(filteredAbonos);
         }
 
+        const userRole = (localStorage.getItem('user_role') || '').toLowerCase();
+        if (userRole === 'admin') {
+          setIsAdmin(true);
+          try {
+            const allUsers = await api.usuarios.getAll();
+            setVendedores(allUsers.filter(u => u.rol === 'vendedor' || u.rol === 'asesor'));
+          } catch (e) {
+            console.error("No se pudo cargar la lista de vendedores", e);
+          }
+        }
+
       } catch (err: any) {
         setError(err.message || 'Error al cargar los detalles del terreno.');
       } finally {
@@ -138,6 +153,31 @@ const TerrenoDetail: React.FC<TerrenoDetailProps> = ({ terrenoId, onBack }) => {
   const handlePaymentSuccess = () => {
     setIsPaymentModalOpen(false);
     fetchData();
+  };
+
+  const handleAsignarVendedor = async (vendedorId: string) => {
+    if (!terreno) return;
+    try {
+      setIsUpdatingVendedor(true);
+      await api.terrenos.update(terreno.id, {
+        clave: terreno.clave,
+        nombre: terreno.nombre || '',
+        fase: terreno.fase || '',
+        superficie_m2: terreno.superficie_m2,
+        precio_lista: terreno.precio_lista,
+        propietario: terreno.propietario || '',
+        estado: terreno.estado,
+        coordenadas: terreno.coordenadas || '',
+        notas: terreno.notas || '',
+        moneda: 'MXN',
+        vendedor_id: vendedorId === '' ? undefined : vendedorId
+      });
+      await fetchData();
+    } catch (e: any) {
+      alert("Error al asignar vendedor: " + (e.message || ""));
+    } finally {
+      setIsUpdatingVendedor(false);
+    }
   };
 
   if (loading) {
@@ -219,9 +259,29 @@ const TerrenoDetail: React.FC<TerrenoDetailProps> = ({ terrenoId, onBack }) => {
             <span className="block text-sm font-medium text-neutral-400 mb-1">Precio de Lista</span>
             <span className="text-lg font-semibold text-emerald-600">${terreno.precio_lista.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span>
           </div>
-          <div className="md:col-span-2">
+          <div>
             <span className="block text-sm font-medium text-neutral-400 mb-1">Propietario Actual</span>
             <span className="text-lg font-semibold text-neutral-800">{terreno.propietario || 'Sin asignar'}</span>
+          </div>
+          <div>
+            <span className="block text-sm font-medium text-neutral-400 mb-1">Vendedor Asignado</span>
+            {isAdmin ? (
+              <select 
+                className="w-full text-sm border-b border-neutral-200 bg-transparent pb-1 text-neutral-800 font-medium focus:outline-none focus:border-orange-500 cursor-pointer disabled:opacity-50"
+                value={terreno.vendedor_id || ''}
+                onChange={(e) => handleAsignarVendedor(e.target.value)}
+                disabled={isUpdatingVendedor}
+              >
+                <option value="">-- Ninguno --</option>
+                {vendedores.map(v => (
+                  <option key={v.id} value={v.id}>{v.nombre_completo || v.nombre || v.email}</option>
+                ))}
+              </select>
+            ) : (
+              <span className="text-lg font-semibold text-neutral-800">
+                {vendedores.find(v => v.id === terreno.vendedor_id)?.nombre_completo || 'Sin asignar'}
+              </span>
+            )}
           </div>
         </div>
       </div>

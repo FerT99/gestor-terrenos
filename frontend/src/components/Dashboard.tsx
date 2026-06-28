@@ -3,13 +3,15 @@ import { Wallet, AlertTriangle, Loader2 } from 'lucide-react';
 import RevenueChart from './RevenueChart';
 import AuditLogViewer from './AuditLogViewer';
 import MonthlyPaymentsModal from './MonthlyPaymentsModal';
-import { api, type Abono, type ClienteMoroso, type Egreso } from '../lib/api';
+import { api, type Abono, type ClienteMoroso, type Egreso, type Terreno } from '../lib/api';
+import { supabase } from '../lib/supabase';
 
 interface DashboardProps {
   onViewMorosos?: () => void;
+  onViewTerreno?: (id: string) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ onViewMorosos }) => {
+const Dashboard: React.FC<DashboardProps> = ({ onViewMorosos, onViewTerreno }) => {
   const [abonos, setAbonos] = useState<Abono[]>([]);
 
   const [morosos, setMorosos] = useState<ClienteMoroso[]>([]);
@@ -21,15 +23,37 @@ const Dashboard: React.FC<DashboardProps> = ({ onViewMorosos }) => {
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const userId = session?.user?.id;
+        
         const parcelaId = localStorage.getItem('selected_parcela') || '';
-        const [abonosData, morososData, egresosData] = await Promise.all([
+        const userRole = (localStorage.getItem('user_role') || '').toLowerCase();
+        
+        const [abonosData, morososData, egresosData, terrenosData] = await Promise.all([
           api.abonos.getAll(),
           api.reportes.getMorosos(),
           parcelaId ? api.egresos.getAll(parcelaId) : Promise.resolve([]),
+          api.terrenos.getAll(),
         ]);
-        setAbonos(abonosData || []);
-        setMorosos(morososData || []);
-        setEgresos(egresosData || []);
+
+        let filteredAbonos = abonosData || [];
+        let filteredMorosos = morososData || [];
+        let filteredEgresos = egresosData || [];
+
+        // Si no es administrador, filtramos para que vea solo lo suyo
+        if (userRole !== 'admin' && userId) {
+          const myTerrenoIds = new Set(
+            (terrenosData || []).filter(t => t.vendedor_id === userId).map(t => t.id)
+          );
+          
+          filteredAbonos = filteredAbonos.filter(a => a.terreno_id && myTerrenoIds.has(a.terreno_id));
+          filteredMorosos = filteredMorosos.filter(m => m.terreno_id && myTerrenoIds.has(m.terreno_id));
+          filteredEgresos = []; // Vendedores no ven egresos globales
+        }
+
+        setAbonos(filteredAbonos);
+        setMorosos(filteredMorosos);
+        setEgresos(filteredEgresos);
       } catch (err) {
         console.error('Error fetching dashboard metrics:', err);
       } finally {
@@ -211,6 +235,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onViewMorosos }) => {
         month={selectedMonthDetails?.month ?? 0}
         year={selectedMonthDetails?.year ?? new Date().getFullYear()}
         abonos={abonos}
+        onNavigateToTerreno={onViewTerreno}
       />
     </main>
   );

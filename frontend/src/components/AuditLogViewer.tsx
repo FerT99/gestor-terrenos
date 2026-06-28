@@ -15,10 +15,17 @@ const AuditLogViewer = () => {
         ]);
         
         if (data && me) {
-          // Filtrar logs para no mostrar los del propio admin actual ni los antiguos hardcodeados
-          setLogs(data.filter(log => log.usuario_nombre !== me.nombre && log.usuario_nombre !== 'Administrador'));
+          // Filtrar logs para no mostrar los del propio usuario actual, pero sí los de todos los demás.
+          // También filtramos los logs antiguos que se guardaron como 'undefined' o 'Administrador' por error.
+          const myName = me.nombre || me.nombre_completo;
+          setLogs(data.filter(log => 
+            log.usuario_nombre !== myName && 
+            log.usuario_nombre !== me.nombre_completo &&
+            log.usuario_nombre !== 'undefined' &&
+            log.usuario_nombre !== 'Administrador'
+          ));
         } else {
-          setLogs(data || []);
+          setLogs((data || []).filter(log => log.usuario_nombre !== 'undefined' && log.usuario_nombre !== 'Administrador'));
         }
       } catch (err) {
         console.error("Error cargando audit logs", err);

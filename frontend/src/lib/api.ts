@@ -143,6 +143,7 @@ export interface Abono {
   terreno_clave?: string;
   terreno_nombre?: string;
   cliente_nombre?: string;
+  terreno_id?: string;
 }
 
 

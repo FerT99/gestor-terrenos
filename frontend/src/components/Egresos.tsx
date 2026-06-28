@@ -18,8 +18,15 @@ const Egresos: React.FC = () => {
   const fetchEgresos = async () => {
     if (!parcelaId) return;
     try {
+      const userRole = (localStorage.getItem('user_role') || '').toLowerCase();
       const data = await api.egresos.getAll(parcelaId);
-      setEgresos(data || []);
+      
+      // Solo el administrador debe ver los egresos
+      if (userRole === 'admin') {
+        setEgresos(data || []);
+      } else {
+        setEgresos([]);
+      }
     } catch (err) {
       console.error('Error fetching egresos:', err);
     } finally {

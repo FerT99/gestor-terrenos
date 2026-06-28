@@ -8,11 +8,12 @@ interface MonthlyPaymentsModalProps {
   month: number;
   year: number;
   abonos: Abono[];
+  onNavigateToTerreno?: (id: string) => void;
 }
 
 const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
-const MonthlyPaymentsModal: React.FC<MonthlyPaymentsModalProps> = ({ isOpen, onClose, month, year, abonos }) => {
+const MonthlyPaymentsModal: React.FC<MonthlyPaymentsModalProps> = ({ isOpen, onClose, month, year, abonos, onNavigateToTerreno }) => {
   if (!isOpen) return null;
 
   const filteredAbonos = abonos.filter(abono => {
@@ -85,7 +86,16 @@ const MonthlyPaymentsModal: React.FC<MonthlyPaymentsModalProps> = ({ isOpen, onC
                   </tr>
                 ) : (
                   filteredAbonos.map(abono => (
-                    <tr key={abono.id} className="hover:bg-neutral-50 transition-colors">
+                    <tr 
+                      key={abono.id} 
+                      className={`transition-colors ${onNavigateToTerreno && abono.terreno_id ? 'hover:bg-orange-50 cursor-pointer' : 'hover:bg-neutral-50'}`}
+                      onClick={() => {
+                        if (onNavigateToTerreno && abono.terreno_id) {
+                          onNavigateToTerreno(abono.terreno_id);
+                          onClose();
+                        }
+                      }}
+                    >
                       <td className="px-4 py-3 whitespace-nowrap text-sm text-neutral-600">
                         {new Date(abono.fecha_pago).toLocaleDateString()}
                       </td>
@@ -93,7 +103,7 @@ const MonthlyPaymentsModal: React.FC<MonthlyPaymentsModalProps> = ({ isOpen, onC
                         <div className="font-medium text-neutral-900">{abono.cliente_nombre || 'Cliente Desconocido'}</div>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <div className="text-sm font-medium text-neutral-900">{abono.terreno_clave || '-'}</div>
+                        <div className="text-sm font-medium text-neutral-900 hover:text-orange-600 transition-colors">{abono.terreno_clave || '-'}</div>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-right font-bold text-neutral-900">
                         ${abono.monto_pagado.toLocaleString('es-MX', {minimumFractionDigits: 2})} {abono.moneda}
