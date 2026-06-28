@@ -3,7 +3,7 @@ import { Wallet, AlertTriangle, Loader2 } from 'lucide-react';
 import RevenueChart from './RevenueChart';
 import AuditLogViewer from './AuditLogViewer';
 import MonthlyPaymentsModal from './MonthlyPaymentsModal';
-import { api, type Abono, type ClienteMoroso, type Egreso, type Terreno } from '../lib/api';
+import { api, type Abono, type ClienteMoroso, type Egreso } from '../lib/api';
 import { supabase } from '../lib/supabase';
 
 interface DashboardProps {
