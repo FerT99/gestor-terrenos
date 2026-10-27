@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Triangle, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { isValidEmail } from '../lib/security';
 import './Login.css';
 
 interface LoginProps {
@@ -13,18 +14,64 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Permite únicamente caracteres válidos para un correo: a-z, A-Z, 0-9, @, ., _, -, +
+    // Bloquea comillas, espacios, <>, slashes, caracteres de control o intentos de inyección
+    let clean = e.target.value.replace(/[^a-zA-Z0-9@._+-]/g, '');
+
+    // Evita más de un '@'
+    const atIndex = clean.indexOf('@');
+    if (atIndex !== -1) {
+      const beforeAt = clean.substring(0, atIndex + 1);
+      const afterAt = clean.substring(atIndex + 1).replace(/@/g, '');
+      clean = beforeAt + afterAt;
+    }
+
+    // Limita longitud máxima (64 caracteres es suficiente para cualquier correo corporativo)
+    if (clean.length > 64) {
+      clean = clean.slice(0, 64);
+    }
+
+    setEmail(clean);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setLoading(true);
 
-    const { error: authError } = await onLogin(email, password);
-
-    if (authError) {
-      setError(authError);
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail) {
+      setError('Por favor, ingresa tu correo electrónico.');
+      return;
     }
 
-    setLoading(false);
+    if (!isValidEmail(cleanEmail)) {
+      setError('Formato de correo inválido (ejemplo: usuario@loterra.com).');
+      return;
+    }
+
+    if (!password) {
+      setError('Por favor, ingresa tu contraseña.');
+      return;
+    }
+
+    if (password.length > 128) {
+      setError('La contraseña excede la longitud permitida.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const { error: authError } = await onLogin(cleanEmail, password);
+      if (authError) {
+        setError(authError);
+      }
+    } catch (err: any) {
+      setError(err?.message || 'Error al iniciar sesión');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -53,9 +100,13 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 placeholder="nombre@loterra.com"
                 className="login-input"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={handleEmailChange}
+                maxLength={64}
                 required
                 autoComplete="email"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck="false"
               />
             </div>
           </div>

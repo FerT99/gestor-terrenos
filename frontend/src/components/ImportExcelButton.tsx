@@ -1,6 +1,7 @@
-﻿import React, { useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Upload, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { validateFile, FILE_RULES, safeId, isValidId } from '../lib/security';
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
 
@@ -16,12 +17,21 @@ export default function ImportExcelButton({ parcelaId, onSuccess }: ImportExcelB
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+
+    try {
+      validateFile(file, FILE_RULES.excel);
+    } catch (err: any) {
+      alert(err.message);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
     
     setIsLoading(true);
     const formData = new FormData();
     formData.append("file", file);
     
-    const activeParcelaId = parcelaId || localStorage.getItem('selected_parcela') || '';
+    const storedParcelaId = parcelaId || localStorage.getItem('selected_parcela') || '';
+    const activeParcelaId = isValidId(storedParcelaId) ? storedParcelaId : '';
     if (activeParcelaId) {
       formData.append("parcela_id", activeParcelaId);
     }
@@ -37,7 +47,7 @@ export default function ImportExcelButton({ parcelaId, onSuccess }: ImportExcelB
       }
       
       const endpoint = activeParcelaId 
-        ? `${API_URL}/api/v1/parcelas/${activeParcelaId}/import/excel`
+        ? `${API_URL}/api/v1/parcelas/${safeId(activeParcelaId)}/import/excel`
         : `${API_URL}/api/v1/import/excel`;
         
       const response = await fetch(endpoint, {

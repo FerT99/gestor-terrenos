@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Banknote, Calendar, CheckCircle2, AlertTriangle, ExternalLink, Loader2, PlusCircle, Upload, FileText, Pencil, Trash2 } from 'lucide-react';
 import { api, type Terreno, type PlanPago, type Abono, type Cliente, type Usuario } from '../lib/api';
 import { generateReceipt } from '../lib/pdfGenerator';
+import { safeUrl } from '../lib/security';
 import NewPaymentModal from './NewPaymentModal';
 import EditPaymentModal from './EditPaymentModal';
 import ErrorBoundary from './ErrorBoundary';
@@ -195,7 +196,7 @@ const TerrenoDetail: React.FC<TerrenoDetailProps> = ({ terrenoId, onBack }) => {
         coordenadas: terreno.coordenadas || '',
         notas: terreno.notas || '',
         moneda: 'MXN',
-        vendedor_id: terreno.vendedor_id
+        vendedor_id: terreno.vendedor_id ?? undefined
       });
 
       await fetchData();
@@ -442,11 +443,11 @@ const TerrenoDetail: React.FC<TerrenoDetailProps> = ({ terrenoId, onBack }) => {
                         ${a.monto_pagado.toLocaleString('es-MX', {minimumFractionDigits: 2})} {a.moneda || 'MXN'}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        {a.comprobante_url ? (
+                        {safeUrl(a.comprobante_url) ? (
                           <a 
-                            href={a.comprobante_url} 
+                            href={safeUrl(a.comprobante_url)} 
                             target="_blank" 
-                            rel="noreferrer"
+                            rel="noopener noreferrer"
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg text-sm font-medium transition-colors"
                           >
                             Ver archivo <ExternalLink size={14} />

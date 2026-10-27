@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Building2, Gavel, RefreshCw, AlertTriangle, Map, Plus, Users, UserPlus, CheckCircle2, Save, Loader2, Layers, Check, X } from 'lucide-react';
+import { Building2, Gavel, RefreshCw, AlertTriangle, Map, Plus, Users, UserPlus, CheckCircle2, Save, Loader2, Layers, X } from 'lucide-react';
 import { api, type Parcela, type Usuario } from '../lib/api';
 import './Settings.css';
 
@@ -23,7 +23,6 @@ const Settings = () => {
   const [perfilMsg, setPerfilMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Reglas de Negocio
-  const [comisionBase, setComisionBase] = useState('6.75');
   const [porcentajeMora, setPorcentajeMora] = useState('15.0');
   const [permitirDiasGracia, setPermitirDiasGracia] = useState(true);
   const [savingReglas, setSavingReglas] = useState(false);
@@ -45,7 +44,7 @@ const Settings = () => {
   const [equipo, setEquipo] = useState<Usuario[]>([]);
   const [loadingEquipo, setLoadingEquipo] = useState(false);
   const [showNewVendedorModal, setShowNewVendedorModal] = useState(false);
-  
+
   // Nuevo Vendedor
   const [nvNombre, setNvNombre] = useState('');
   const [nvEmail, setNvEmail] = useState('');
@@ -135,10 +134,9 @@ const Settings = () => {
         setDireccionFiscal(data.direccion_fiscal || '');
         setEmailSoporte(data.email_soporte || '');
         setTelefonoContacto(data.telefono_contacto || '');
-        setComisionBase(data.comision_base !== undefined ? String(data.comision_base) : '6.75');
         setPorcentajeMora(data.porcentaje_mora !== undefined ? String(data.porcentaje_mora) : '15.0');
         setPermitirDiasGracia(data.permitir_dias_gracia ?? true);
-        
+
         if (data.tipo_cambio_usd !== undefined) {
           setTipoCambioUsd(String(data.tipo_cambio_usd));
         }
@@ -269,8 +267,8 @@ const Settings = () => {
     setLoadingParcela(true);
     try {
       const comVal = parseFloat(newParcelaComision);
-      await api.parcelas.create({ 
-        nombre: newParcelaName, 
+      await api.parcelas.create({
+        nombre: newParcelaName,
         descripcion: newParcelaDesc,
         comision_base: isNaN(comVal) ? 6.75 : comVal
       });
@@ -391,17 +389,15 @@ const Settings = () => {
       <div className="flex border-b border-neutral-200 mb-6">
         <button
           onClick={() => setActiveTab('general')}
-          className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors ${
-            activeTab === 'general' ? 'border-orange-500 text-orange-600' : 'border-transparent text-neutral-500 hover:text-neutral-700'
-          }`}
+          className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors ${activeTab === 'general' ? 'border-orange-500 text-orange-600' : 'border-transparent text-neutral-500 hover:text-neutral-700'
+            }`}
         >
           Ajustes Generales
         </button>
         <button
           onClick={() => setActiveTab('equipo')}
-          className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors flex items-center gap-2 ${
-            activeTab === 'equipo' ? 'border-orange-500 text-orange-600' : 'border-transparent text-neutral-500 hover:text-neutral-700'
-          }`}
+          className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors flex items-center gap-2 ${activeTab === 'equipo' ? 'border-orange-500 text-orange-600' : 'border-transparent text-neutral-500 hover:text-neutral-700'
+            }`}
         >
           <Users size={16} />
           Equipo de Ventas
@@ -422,22 +418,22 @@ const Settings = () => {
                 <div className="form-grid">
                   <div className="form-group">
                     <label>Razón Social</label>
-                    <input 
-                      type="text" 
-                      value={razonSocial} 
-                      onChange={e => setRazonSocial(e.target.value)} 
-                      className="form-input" 
+                    <input
+                      type="text"
+                      value={razonSocial}
+                      onChange={e => setRazonSocial(e.target.value)}
+                      className="form-input"
                       placeholder="Nombre de la empresa"
                       required
                     />
                   </div>
                   <div className="form-group">
                     <label>Tax ID / RFC</label>
-                    <input 
-                      type="text" 
-                      value={rfc} 
-                      onChange={e => setRfc(e.target.value)} 
-                      className="form-input" 
+                    <input
+                      type="text"
+                      value={rfc}
+                      onChange={e => setRfc(e.target.value)}
+                      className="form-input"
                       placeholder="RFC o Tax ID"
                     />
                   </div>
@@ -445,11 +441,11 @@ const Settings = () => {
 
                 <div className="form-group mt-4">
                   <label>Dirección Fiscal</label>
-                  <input 
-                    type="text" 
-                    value={direccionFiscal} 
-                    onChange={e => setDireccionFiscal(e.target.value)} 
-                    className="form-input" 
+                  <input
+                    type="text"
+                    value={direccionFiscal}
+                    onChange={e => setDireccionFiscal(e.target.value)}
+                    className="form-input"
                     placeholder="Dirección fiscal completa"
                   />
                 </div>
@@ -457,21 +453,21 @@ const Settings = () => {
                 <div className="form-grid mt-4">
                   <div className="form-group">
                     <label>Email de Soporte</label>
-                    <input 
-                      type="email" 
-                      value={emailSoporte} 
-                      onChange={e => setEmailSoporte(e.target.value)} 
-                      className="form-input" 
+                    <input
+                      type="email"
+                      value={emailSoporte}
+                      onChange={e => setEmailSoporte(e.target.value)}
+                      className="form-input"
                       placeholder="correo@empresa.com"
                     />
                   </div>
                   <div className="form-group">
                     <label>Teléfono de Contacto</label>
-                    <input 
-                      type="text" 
-                      value={telefonoContacto} 
-                      onChange={e => setTelefonoContacto(e.target.value)} 
-                      className="form-input" 
+                    <input
+                      type="text"
+                      value={telefonoContacto}
+                      onChange={e => setTelefonoContacto(e.target.value)}
+                      className="form-input"
                       placeholder="+1 (555) 000-0000"
                     />
                   </div>
@@ -541,7 +537,7 @@ const Settings = () => {
                         <div className="flex items-center gap-2 shrink-0">
                           <div className="flex items-center gap-1.5 bg-neutral-50 border border-neutral-300 rounded-lg px-2.5 py-1.5 focus-within:border-orange-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-orange-500/20 transition-all">
                             <span className="text-xs text-neutral-500 font-medium">Comisión:</span>
-                            <input 
+                            <input
                               type="number"
                               step="0.01"
                               min="0"
@@ -553,7 +549,7 @@ const Settings = () => {
                             <span className="text-xs font-semibold text-neutral-500">%</span>
                           </div>
 
-                          <button 
+                          <button
                             type="button"
                             onClick={() => handleUpdateParcelaComision(p.id)}
                             disabled={isSavingThis}
@@ -595,12 +591,12 @@ const Settings = () => {
                     </div>
                     <p className="rule-desc">Tasa de penalización aplicada a pagos vencidos.</p>
                     <div className="rule-input-wrapper">
-                      <input 
-                        type="number" 
-                        step="0.01" 
-                        value={porcentajeMora} 
-                        onChange={e => setPorcentajeMora(e.target.value)} 
-                        className="rule-input" 
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={porcentajeMora}
+                        onChange={e => setPorcentajeMora(e.target.value)}
+                        className="rule-input"
                         required
                       />
                       <span className="rule-suffix">%</span>
@@ -625,10 +621,10 @@ const Settings = () => {
                     <span className="toggle-desc">Habilitar un periodo de gracia estándar de 5 días antes de aplicar mora.</span>
                   </div>
                   <label className="switch">
-                    <input 
-                      type="checkbox" 
-                      checked={permitirDiasGracia} 
-                      onChange={e => setPermitirDiasGracia(e.target.checked)} 
+                    <input
+                      type="checkbox"
+                      checked={permitirDiasGracia}
+                      onChange={e => setPermitirDiasGracia(e.target.checked)}
                     />
                     <span className="slider round"></span>
                   </label>
@@ -701,9 +697,9 @@ const Settings = () => {
                   </span>
                 </div>
 
-                <button 
-                  type="button" 
-                  onClick={() => syncTipoCambioHoy(true)} 
+                <button
+                  type="button"
+                  onClick={() => syncTipoCambioHoy(true)}
                   disabled={savingTipoCambio || loadingConfig}
                   className="btn-primary w-full flex items-center justify-center gap-2 mt-2"
                 >
@@ -752,39 +748,39 @@ const Settings = () => {
                 <h4 className="text-sm font-medium text-neutral-900 mb-3">Registrar Nueva Parcela</h4>
                 <form onSubmit={handleCreateParcela} className="space-y-3">
                   <div className="form-group">
-                    <input 
-                      type="text" 
-                      placeholder="Nombre de la parcela (Ej. Villa del Sol)" 
-                      className="form-input" 
+                    <input
+                      type="text"
+                      placeholder="Nombre de la parcela (Ej. Villa del Sol)"
+                      className="form-input"
                       value={newParcelaName}
                       onChange={e => setNewParcelaName(e.target.value)}
                       required
                     />
                   </div>
                   <div className="form-group">
-                    <input 
-                      type="text" 
-                      placeholder="Descripción (opcional)" 
-                      className="form-input" 
+                    <input
+                      type="text"
+                      placeholder="Descripción (opcional)"
+                      className="form-input"
                       value={newParcelaDesc}
                       onChange={e => setNewParcelaDesc(e.target.value)}
                     />
                   </div>
                   <div className="form-group">
                     <label className="text-xs text-neutral-500 font-medium mb-1 block">Comisión Base para esta Parcela (%)</label>
-                    <input 
+                    <input
                       type="number"
                       step="0.01"
                       min="0"
                       max="100"
-                      placeholder="6.75" 
-                      className="form-input" 
+                      placeholder="6.75"
+                      className="form-input"
                       value={newParcelaComision}
                       onChange={e => setNewParcelaComision(e.target.value)}
                     />
                   </div>
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     disabled={loadingParcela || !newParcelaName}
                     className="w-full flex items-center justify-center gap-2 bg-orange-50 hover:bg-orange-100 text-orange-700 px-4 py-2.5 rounded-xl font-medium transition-colors border border-orange-200 disabled:opacity-50"
                   >
@@ -805,7 +801,7 @@ const Settings = () => {
               <Users size={20} className="card-icon" />
               <h3 className="card-title">Directorio del Equipo</h3>
             </div>
-            <button 
+            <button
               onClick={() => setShowNewVendedorModal(true)}
               className="flex items-center gap-2 bg-neutral-900 hover:bg-neutral-800 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors"
             >
@@ -813,7 +809,7 @@ const Settings = () => {
               Añadir Usuario
             </button>
           </div>
-          
+
           <p className="card-desc mb-6">
             Los usuarios que añadas aquí podrán iniciar sesión en la plataforma. Los Administradores tienen acceso total, y los Vendedores solo a los terrenos asignados.
           </p>
@@ -847,9 +843,8 @@ const Settings = () => {
                         <td className="px-4 py-3 font-medium text-neutral-900">{u.nombre_completo || u.nombre}</td>
                         <td className="px-4 py-3 text-neutral-600">{u.email}</td>
                         <td className="px-4 py-3">
-                          <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium capitalize ${
-                            u.rol === 'admin' ? 'bg-purple-50 text-purple-700' : 'bg-orange-50 text-orange-700'
-                          }`}>
+                          <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium capitalize ${u.rol === 'admin' ? 'bg-purple-50 text-purple-700' : 'bg-orange-50 text-orange-700'
+                            }`}>
                             {u.rol}
                           </span>
                         </td>
@@ -926,7 +921,7 @@ const Settings = () => {
 
               <div className="form-group">
                 <label>Rol en el sistema</label>
-                <select 
+                <select
                   value={nvRol}
                   onChange={(e) => setNvRol(e.target.value)}
                   className="w-full p-2.5 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 bg-white"
@@ -938,8 +933,8 @@ const Settings = () => {
 
               <div className="form-group">
                 <label>Nombre Completo</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   required
                   value={nvNombre}
                   onChange={(e) => setNvNombre(e.target.value)}
@@ -950,8 +945,8 @@ const Settings = () => {
 
               <div className="form-group">
                 <label>Correo Electrónico</label>
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   required
                   value={nvEmail}
                   onChange={(e) => setNvEmail(e.target.value)}
@@ -962,8 +957,8 @@ const Settings = () => {
 
               <div className="form-group">
                 <label>Contraseña Temporal</label>
-                <input 
-                  type="password" 
+                <input
+                  type="password"
                   required
                   value={nvPassword}
                   onChange={(e) => setNvPassword(e.target.value)}
@@ -1003,14 +998,13 @@ const Settings = () => {
                         <div
                           key={p.id}
                           onClick={() => toggleNvParcela(p.id)}
-                          className={`flex items-center gap-2.5 p-2 rounded-lg border text-xs cursor-pointer transition-colors ${
-                            isChecked ? 'bg-white border-orange-500 text-neutral-900 font-medium shadow-xs' : 'bg-white/60 border-neutral-200 text-neutral-600 hover:bg-white'
-                          }`}
+                          className={`flex items-center gap-2.5 p-2 rounded-lg border text-xs cursor-pointer transition-colors ${isChecked ? 'bg-white border-orange-500 text-neutral-900 font-medium shadow-xs' : 'bg-white/60 border-neutral-200 text-neutral-600 hover:bg-white'
+                            }`}
                         >
                           <input
                             type="checkbox"
                             checked={isChecked}
-                            onChange={() => {}}
+                            onChange={() => { }}
                             className="w-3.5 h-3.5 text-orange-600 rounded border-neutral-300 focus:ring-orange-500 pointer-events-none"
                           />
                           <span className="flex-1">{p.nombre}</span>
@@ -1026,14 +1020,14 @@ const Settings = () => {
               )}
 
               <div className="flex justify-end gap-3 pt-4 mt-6 border-t border-neutral-100">
-                <button 
+                <button
                   type="button"
                   onClick={() => setShowNewVendedorModal(false)}
                   className="px-4 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-50 rounded-lg transition-colors"
                 >
                   Cancelar
                 </button>
-                <button 
+                <button
                   type="submit"
                   disabled={nvLoading || nvSuccess}
                   className="px-4 py-2 bg-neutral-900 text-white rounded-lg text-sm font-medium hover:bg-neutral-800 disabled:opacity-50 transition-colors flex items-center gap-2"
@@ -1060,7 +1054,7 @@ const Settings = () => {
                   Vendedor: <strong className="text-neutral-800">{assignModalUser.nombre_completo || assignModalUser.nombre || assignModalUser.email}</strong>
                 </p>
               </div>
-              <button 
+              <button
                 onClick={() => setAssignModalUser(null)}
                 className="p-2 text-neutral-400 hover:text-neutral-600 rounded-lg hover:bg-neutral-100"
               >
@@ -1096,17 +1090,16 @@ const Settings = () => {
                       <div
                         key={p.id}
                         onClick={() => toggleParcelaForUser(p.id)}
-                        className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${
-                          isChecked 
-                            ? 'border-orange-500 bg-orange-50/50 shadow-xs' 
-                            : 'border-neutral-200 hover:bg-neutral-50'
-                        }`}
+                        className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${isChecked
+                          ? 'border-orange-500 bg-orange-50/50 shadow-xs'
+                          : 'border-neutral-200 hover:bg-neutral-50'
+                          }`}
                       >
                         <div className="flex items-center gap-3">
                           <input
                             type="checkbox"
                             checked={isChecked}
-                            onChange={() => {}}
+                            onChange={() => { }}
                             className="w-4 h-4 text-orange-600 rounded border-neutral-300 focus:ring-orange-500 pointer-events-none"
                           />
                           <div>

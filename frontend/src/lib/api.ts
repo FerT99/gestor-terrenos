@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { secureBody, safeId, schemas, validateFile, FILE_RULES } from './security';
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
 
@@ -259,7 +260,7 @@ export const api = {
       const res = await fetch(`${API_URL}/api/v1/parcelas`, {
         method: 'POST',
         headers,
-        body: JSON.stringify(input)
+        body: secureBody(input, schemas.parcela)
       });
       if (!res.ok) throw new Error('Error al crear parcela');
       const json = await res.json();
@@ -271,10 +272,10 @@ export const api = {
       if (session?.access_token) {
         headers['Authorization'] = `Bearer ${session.access_token}`;
       }
-      const res = await fetch(`${API_URL}/api/v1/parcelas/${id}`, {
+      const res = await fetch(`${API_URL}/api/v1/parcelas/${safeId(id)}`, {
         method: 'PUT',
         headers,
-        body: JSON.stringify(input)
+        body: secureBody(input, schemas.parcela, true)
       });
       if (!res.ok) throw new Error('Error al actualizar parcela');
       const json = await res.json();
@@ -296,7 +297,7 @@ export const api = {
       const res = await fetch(`${API_URL}/api/v1/terrenos`, {
         method: 'POST',
         headers,
-        body: JSON.stringify(input),
+        body: secureBody(input, schemas.terreno),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -308,10 +309,10 @@ export const api = {
 
     update: async (id: string, input: TerrenoInput): Promise<Terreno> => {
       const headers = await getAuthHeaders();
-      const res = await fetch(`${API_URL}/api/v1/terrenos/${id}`, {
+      const res = await fetch(`${API_URL}/api/v1/terrenos/${safeId(id)}`, {
         method: 'PUT',
         headers,
-        body: JSON.stringify(input),
+        body: secureBody(input, schemas.terreno),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -323,7 +324,7 @@ export const api = {
 
     delete: async (id: string): Promise<void> => {
       const headers = await getAuthHeaders();
-      const res = await fetch(`${API_URL}/api/v1/terrenos/${id}`, {
+      const res = await fetch(`${API_URL}/api/v1/terrenos/${safeId(id)}`, {
         method: 'DELETE',
         headers,
       });
@@ -345,7 +346,7 @@ export const api = {
       const res = await fetch(`${API_URL}/api/v1/clientes`, {
         method: 'POST',
         headers,
-        body: JSON.stringify(input),
+        body: secureBody(input, schemas.cliente),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -357,10 +358,10 @@ export const api = {
 
     update: async (id: string, input: ClienteInput): Promise<Cliente> => {
       const headers = await getAuthHeaders();
-      const res = await fetch(`${API_URL}/api/v1/clientes/${id}`, {
+      const res = await fetch(`${API_URL}/api/v1/clientes/${safeId(id)}`, {
         method: 'PUT',
         headers,
-        body: JSON.stringify(input),
+        body: secureBody(input, schemas.cliente),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -372,7 +373,7 @@ export const api = {
 
     delete: async (id: string): Promise<void> => {
       const headers = await getAuthHeaders();
-      const res = await fetch(`${API_URL}/api/v1/clientes/${id}`, {
+      const res = await fetch(`${API_URL}/api/v1/clientes/${safeId(id)}`, {
         method: 'DELETE',
         headers,
       });
@@ -394,7 +395,7 @@ export const api = {
       const res = await fetch(`${API_URL}/api/v1/planes-pago`, {
         method: 'POST',
         headers,
-        body: JSON.stringify(input),
+        body: secureBody(input, schemas.planPago),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -406,7 +407,7 @@ export const api = {
 
     getPeriodos: async (planId: string): Promise<PeriodoPago[]> => {
       const headers = await getAuthHeaders();
-      const res = await fetch(`${API_URL}/api/v1/planes-pago/${planId}/periodos`, { headers });
+      const res = await fetch(`${API_URL}/api/v1/planes-pago/${safeId(planId)}/periodos`, { headers });
       if (!res.ok) throw new Error('Error al obtener periodos');
       const json = await res.json();
       return (json.data ?? []) as PeriodoPago[];
@@ -426,7 +427,7 @@ export const api = {
       const res = await fetch(`${API_URL}/api/v1/abonos`, {
         method: 'POST',
         headers,
-        body: JSON.stringify(input),
+        body: secureBody(input, schemas.abono),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -437,19 +438,24 @@ export const api = {
     },
     getByPeriodo: async (periodoId: string): Promise<Abono[]> => {
       const headers = await getAuthHeaders();
-      const res = await fetch(`${API_URL}/api/v1/periodos/${periodoId}/abonos`, { headers });
+      const res = await fetch(`${API_URL}/api/v1/periodos/${safeId(periodoId)}/abonos`, { headers });
       if (!res.ok) throw new Error('Error al obtener abonos');
       const json = await res.json();
       return (json.data ?? []) as Abono[];
     },
     uploadComprobante: async (file: File): Promise<string> => {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+      // La extensión sale del MIME validado, nunca del nombre que manda el usuario
+      // (evita subir .html/.svg con scripts a un bucket público).
+      const fileExt = validateFile(file, FILE_RULES.comprobante);
+      const fileName = `${crypto.randomUUID()}_${Date.now()}.${fileExt}`;
       const filePath = `${fileName}`;
 
       const { error } = await supabase.storage
         .from('comprobantes')
-        .upload(filePath, file);
+        .upload(filePath, file, {
+          contentType: file.type || undefined,
+          upsert: false,
+        });
 
       if (error) {
         throw new Error(`Error subiendo archivo: ${error.message}`);
@@ -463,10 +469,10 @@ export const api = {
     },
     updateComprobante: async (id: string, comprobante_url: string): Promise<void> => {
       const headers = await getAuthHeaders();
-      const res = await fetch(`${API_URL}/api/v1/abonos/${id}/comprobante`, {
+      const res = await fetch(`${API_URL}/api/v1/abonos/${safeId(id)}/comprobante`, {
         method: 'PATCH',
         headers,
-        body: JSON.stringify({ comprobante_url }),
+        body: secureBody({ comprobante_url }, schemas.comprobante),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -475,10 +481,10 @@ export const api = {
     },
     update: async (id: string, input: Partial<AbonoInput>): Promise<Abono> => {
       const headers = await getAuthHeaders();
-      const res = await fetch(`${API_URL}/api/v1/abonos/${id}`, {
+      const res = await fetch(`${API_URL}/api/v1/abonos/${safeId(id)}`, {
         method: 'PUT',
         headers,
-        body: JSON.stringify(input),
+        body: secureBody(input, schemas.abono, true),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -489,7 +495,7 @@ export const api = {
     },
     delete: async (id: string): Promise<void> => {
       const headers = await getAuthHeaders();
-      const res = await fetch(`${API_URL}/api/v1/abonos/${id}`, {
+      const res = await fetch(`${API_URL}/api/v1/abonos/${safeId(id)}`, {
         method: 'DELETE',
         headers,
       });
@@ -503,17 +509,17 @@ export const api = {
   egresos: {
     getAll: async (parcelaId: string): Promise<Egreso[]> => {
       const headers = await getAuthHeaders();
-      const res = await fetch(`${API_URL}/api/v1/parcelas/${parcelaId}/egresos`, { headers });
+      const res = await fetch(`${API_URL}/api/v1/parcelas/${safeId(parcelaId)}/egresos`, { headers });
       if (!res.ok) throw new Error('Error al obtener egresos');
       const json = await res.json();
       return (json.data ?? []) as Egreso[];
     },
     create: async (parcelaId: string, input: EgresoInput): Promise<Egreso> => {
       const headers = await getAuthHeaders();
-      const res = await fetch(`${API_URL}/api/v1/parcelas/${parcelaId}/egresos`, {
+      const res = await fetch(`${API_URL}/api/v1/parcelas/${safeId(parcelaId)}/egresos`, {
         method: 'POST',
         headers,
-        body: JSON.stringify(input),
+        body: secureBody(input, schemas.egreso),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -524,10 +530,10 @@ export const api = {
     },
     update: async (parcelaId: string, id: string, input: EgresoInput): Promise<Egreso> => {
       const headers = await getAuthHeaders();
-      const res = await fetch(`${API_URL}/api/v1/parcelas/${parcelaId}/egresos/${id}`, {
+      const res = await fetch(`${API_URL}/api/v1/parcelas/${safeId(parcelaId)}/egresos/${safeId(id)}`, {
         method: 'PUT',
         headers,
-        body: JSON.stringify(input),
+        body: secureBody(input, schemas.egreso),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -538,7 +544,7 @@ export const api = {
     },
     delete: async (parcelaId: string, id: string): Promise<void> => {
       const headers = await getAuthHeaders();
-      const res = await fetch(`${API_URL}/api/v1/parcelas/${parcelaId}/egresos/${id}`, {
+      const res = await fetch(`${API_URL}/api/v1/parcelas/${safeId(parcelaId)}/egresos/${safeId(id)}`, {
         method: 'DELETE',
         headers,
       });
@@ -585,7 +591,7 @@ export const api = {
       const res = await fetch(`${API_URL}/api/v1/usuarios/vendedores`, {
         method: 'POST',
         headers,
-        body: JSON.stringify(input)
+        body: secureBody(input, schemas.vendedor)
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -596,10 +602,10 @@ export const api = {
     },
     assignParcelas: async (usuarioId: string, parcelaIds: string[]): Promise<void> => {
       const headers = await getAuthHeaders();
-      const res = await fetch(`${API_URL}/api/v1/usuarios/${usuarioId}/parcelas`, {
+      const res = await fetch(`${API_URL}/api/v1/usuarios/${safeId(usuarioId)}/parcelas`, {
         method: 'PUT',
         headers,
-        body: JSON.stringify({ parcela_ids: parcelaIds }),
+        body: secureBody({ parcela_ids: parcelaIds }, schemas.asignarParcelas),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -621,7 +627,7 @@ export const api = {
       const res = await fetch(`${API_URL}/api/v1/configuracion`, {
         method: 'PUT',
         headers,
-        body: JSON.stringify(input),
+        body: secureBody(input, schemas.configuracion, true),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
