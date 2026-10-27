@@ -1,0 +1,307 @@
+1. [7] | Sup: 379.05 | Precio: 235000 | Prop: 'MIGUEL ANGEL ROMERO GOMEZ' | Estado: vendido
+2. [8] | Sup: 379.05 | Precio: 235000 | Prop: 'HUMBERTO MOLINA DOMINGUEZ' | Estado: vendido
+3. [9] | Sup: 379.05 | Precio: 235000 | Prop: 'ANITA BRISEÑO FIGUEROA' | Estado: vendido
+4. [10] | Sup: 379.05 | Precio: 235000 | Prop: 'GUILLERMO CASTILLO PEREZ' | Estado: vendido
+5. [11] | Sup: 379.05 | Precio: 235000 | Prop: 'GUILLERMO CASTILLO PEREZ' | Estado: vendido
+6. [12] | Sup: 379.05 | Precio: 235000 | Prop: 'GUILLERMO CASTILLO PEREZ' | Estado: vendido
+7. [13] | Sup: 250 | Precio: 160000 | Prop: 'ANTONIO AGUILERA GRANADOS' | Estado: vendido
+8. [14] | Sup: 250 | Precio: 160000 | Prop: 'ANTONIO AGUILERA GRANADOS' | Estado: vendido
+9. [15] | Sup: 250 | Precio: 160000 | Prop: 'NINFA ESCOBEDO CASTRO' | Estado: vendido
+10. [16] | Sup: 250 | Precio: 160000 | Prop: 'CARLOS ARMANDO MENDOZA MENDOZA' | Estado: vendido
+11. [17] | Sup: 250 | Precio: 160000 | Prop: 'JUAN VARELA CANCHOLA' | Estado: vendido
+12. [18] | Sup: 250 | Precio: 160000 | Prop: 'GILBERTO FELIX SOTO' | Estado: vendido
+13. [19] | Sup: 298 | Precio: 190000 | Prop: 'ARIANA BELTRAN VALDIVIA' | Estado: apartado
+14. [20] | Sup: 250 | Precio: 160000 | Prop: 'FRANCISCO ROMAN ZEPEDA ALVARADO' | Estado: vendido
+15. [21] | Sup: 250 | Precio: 160000 | Prop: 'JOSE JUAN ROSALES LOPEZ' | Estado: vendido
+16. [22] | Sup: 250 | Precio: 160000 | Prop: 'NINFA ESCOBEDO CASTRO' | Estado: vendido
+17. [23] | Sup: 250 | Precio: 160000 | Prop: 'MIGUEL ANGEL ARECHIGA' | Estado: vendido
+18. [24] | Sup: 250 | Precio: 160000 | Prop: 'MIGUEL ALEXIS ARECHIGA LOBATOS' | Estado: vendido
+19. [25] | Sup: 250 | Precio: 160000 | Prop: 'GEORGINA BELTRAN VALDIVIA' | Estado: vendido
+20. [26] | Sup: 298 | Precio: 190000 | Prop: 'ANA VICTORIA VALDIVIA GARCIA' | Estado: vendido
+21. [27] | Sup: 250 | Precio: 160000 | Prop: 'MARIO HIRAM SILVA CASTRO' | Estado: vendido
+22. [28] | Sup: 250 | Precio: 160000 | Prop: 'MARIO HIRAM SILVA CASTRO' | Estado: vendido
+23. [29] | Sup: 250 | Precio: 160000 | Prop: 'GUADALUPE MARTINEZ SOLORIO' | Estado: vendido
+24. [30] | Sup: 250 | Precio: 160000 | Prop: 'EVA LUZ OCHOA SOTO' | Estado: vendido
+25. [31] | Sup: 250 | Precio: 160000 | Prop: 'GERARDO ANTONIO OCHOA SOTO' | Estado: vendido
+26. [32] | Sup: 250 | Precio: 144000 | Prop: 'ALONDRA ARELY FUENTES MEJIA' | Estado: vendido
+27. [33] | Sup: 298 | Precio: 190000 | Prop: 'ULISES RIOS BRAVO' | Estado: vendido
+28. [34] | Sup: 250 | Precio: 160000 | Prop: 'RAFAEL MADERO ENRIQUEZ' | Estado: vendido
+29. [35] | Sup: 250 | Precio: 160000 | Prop: 'RAFAEL MADERO ENRIQUEZ' | Estado: vendido
+30. [36] | Sup: 250 | Precio: 160000 | Prop: 'RAFAEL MADERO ENRIQUEZ' | Estado: vendido
+31. [37] | Sup: 250 | Precio: 160000 | Prop: 'JAIME BELMAN RIOS' | Estado: vendido
+32. [38] | Sup: 250 | Precio: 160000 | Prop: 'JAIME BELMAN RIOS' | Estado: vendido
+33. [39] | Sup: 250 | Precio: 144000 | Prop: 'DANIEL FUENTES PEDRAZA' | Estado: vendido
+34. [40] | Sup: 298 | Precio: 190000 | Prop: 'HERIBERTO VALLEJO RUIZ' | Estado: vendido
+35. [41] | Sup: 250 | Precio: 160000 | Prop: 'MARIA GABRIELA ARISPE RIVA' | Estado: vendido
+36. [42] | Sup: 250 | Precio: 160000 | Prop: 'SERGIO MORALES CARRILLO' | Estado: vendido
+37. [43] | Sup: 250 | Precio: 160000 | Prop: 'LUIS VILLANUEVA' | Estado: vendido
+38. [44] | Sup: 250 | Precio: 160000 | Prop: 'LUIS VILLANUEVA' | Estado: vendido
+39. [45] | Sup: 250 | Precio: 160000 | Prop: 'ANA CRISTINA GASCA ALCANTAR' | Estado: vendido
+40. [46] | Sup: 250 | Precio: 160000 | Prop: 'MARIA CECILIA RUIZ GALVAN' | Estado: vendido
+41. [47] | Sup: 298 | Precio: 190000 | Prop: 'MARIA CECILIA RUIZ GALVAN' | Estado: vendido
+42. [62] | Sup: 402.75 | Precio: 255000 | Prop: 'SAMANTHA ADILENE AVALOS DIAZ' | Estado: vendido
+43. [65] | Sup: 402.75 | Precio: 255000 | Prop: 'GABRIELA JIMENEZ AVALOS' | Estado: vendido
+44. [66] | Sup: 402.75 | Precio: 255000 | Prop: 'ANTONIO FLORES SILVA' | Estado: vendido
+45. [67] | Sup: 402.75 | Precio: 216750 | Prop: 'JASSO' | Estado: vendido
+46. [68] | Sup: 402.75 | Precio: 216750 | Prop: 'JASSO' | Estado: vendido
+47. [69] | Sup: 402.75 | Precio: 216750 | Prop: 'MAURILIA JASSO' | Estado: vendido
+48. [70] | Sup: 402.75 | Precio: 255000 | Prop: 'JORGE ALBERTO GARCIA JASSO' | Estado: vendido
+49. [71] | Sup: 402.75 | Precio: 255000 | Prop: 'OSCAR CABANILLAS AYOQUI' | Estado: vendido
+50. [72] | Sup: 402.75 | Precio: 255000 | Prop: 'ROSALBA RAMIREZ DELGADO' | Estado: vendido
+51. [73] | Sup: 402.75 | Precio: 255000 | Prop: 'RITA RODRIGUEZ BRETADO' | Estado: vendido
+52. [74] | Sup: 402.75 | Precio: 255000 | Prop: 'YESSICA ALVAREZ RODRIGUEZ' | Estado: vendido
+53. [75] | Sup: 325 | Precio: 200000 | Prop: 'MARIA AMELIA EMA VALDIVIA GARCIA' | Estado: apartado
+54. [76] | Sup: 250 | Precio: 160000 | Prop: 'ADILENE CRUZ MORALES' | Estado: vendido
+55. [77] | Sup: 250 | Precio: 160000 | Prop: 'HECTOR MIGUEL PEREZ BRIBIESCA' | Estado: vendido
+56. [78] | Sup: 250 | Precio: 160000 | Prop: 'BEATRIZ MENDOZA MENDOZA' | Estado: vendido
+57. [80] | Sup: 250 | Precio: 160000 | Prop: 'JOSE RUBEN CORONA CASTRO' | Estado: vendido
+58. [81] | Sup: 250 | Precio: 160000 | Prop: 'MARIA FRANCISCA ARECHIGA VILLAREAL' | Estado: vendido
+59. [82] | Sup: 250 | Precio: 160000 | Prop: 'MARIA FRANCISCA ARECHIGA VILLAREAL' | Estado: vendido
+60. [83] | Sup: 250 | Precio: 160000 | Prop: 'ABRAHAM BANDA SIMENTAL' | Estado: vendido
+61. [84] | Sup: 250 | Precio: 160000 | Prop: 'GERMAN ZAMUDIO VELADOR' | Estado: vendido
+62. [85] | Sup: 250 | Precio: 160000 | Prop: 'GERMAN ZAMUDIO VELADOR' | Estado: vendido
+63. [86] | Sup: 250 | Precio: 160000 | Prop: 'MIGUEL HERRERA SANCHEZ' | Estado: vendido
+64. [87] | Sup: 250 | Precio: 160000 | Prop: 'MARIA DE JESUS ALVARADO LOPEZ' | Estado: vendido
+65. [88] | Sup: 250 | Precio: 160000 | Prop: 'CECILIA LARA GARCIA' | Estado: vendido
+66. [89] | Sup: 327 | Precio: 200000 | Prop: 'SANDRA GUADALUPE CARDENAS ESQUER' | Estado: vendido
+67. [90] | Sup: 325 | Precio: 200000 | Prop: 'LIDIA GUADALUPE VALDIVIA SANCHEZ' | Estado: vendido
+68. [92] | Sup: 250 | Precio: 160000 | Prop: 'JESSICA KARINA PIMENTEL MACIEL' | Estado: vendido
+69. [93] | Sup: 250 | Precio: 160000 | Prop: 'JESSICA KARINA PIMENTEL MACIEL' | Estado: vendido
+70. [94] | Sup: 250 | Precio: 160000 | Prop: 'JESSICA KARINA PIMENTEL MACIEL' | Estado: vendido
+71. [95] | Sup: 250 | Precio: 160000 | Prop: 'JESSICA KARINA PIMENTEL MACIEL' | Estado: vendido
+72. [96] | Sup: 250 | Precio: 160000 | Prop: 'JESSICA KARINA PIMENTEL MACIEL' | Estado: vendido
+73. [97] | Sup: 250 | Precio: 160000 | Prop: 'HECTOR MORALES SEDANO' | Estado: vendido
+74. [98] | Sup: 250 | Precio: 160000 | Prop: 'HECTOR MORALES SEDANO' | Estado: vendido
+75. [99] | Sup: 250 | Precio: 160000 | Prop: 'FRANCISCA CANDELARIA ROJAS RAMIREZ' | Estado: vendido
+76. [100] | Sup: 250 | Precio: 160000 | Prop: 'OLGA LIDIA PADILLA LOZANO' | Estado: vendido
+77. [101] | Sup: 250 | Precio: 160000 | Prop: 'MARICELA PADILLA LOZANO' | Estado: vendido
+78. [102] | Sup: 250 | Precio: 160000 | Prop: 'PEDRO ANTONIO LEON BELTRAN' | Estado: vendido
+79. [103] | Sup: 250 | Precio: 160000 | Prop: 'PEDRO ANTONIO LEON BELTRAN' | Estado: vendido
+80. [104] | Sup: 327 | Precio: 200000 | Prop: 'DOLORES KARINA CARDENAS' | Estado: vendido
+81. [105] | Sup: 325 | Precio: 200000 | Prop: 'EDUARDO UREÑA VILLEDA' | Estado: vendido
+82. [106] | Sup: 250 | Precio: 160000 | Prop: 'YOSSELYNE ENRIQUEZ MORA' | Estado: vendido
+83. [107] | Sup: 250 | Precio: 160000 | Prop: 'REYNA GUADALUPE SEPULVEDA RODRIGUEZ' | Estado: vendido
+84. [108] | Sup: 250 | Precio: 160000 | Prop: 'GUSTAVO HERNANDEZ GUARDADO' | Estado: vendido
+85. [109] | Sup: 250 | Precio: 160000 | Prop: 'JONATHAN ELIAS MADERO MORENO' | Estado: vendido
+86. [110] | Sup: 250 | Precio: 160000 | Prop: 'JONATHAN ELIAS MADERO MORENO' | Estado: vendido
+87. [111] | Sup: 250 | Precio: 160000 | Prop: 'JONATHAN ELIAS MADERO MORENO' | Estado: vendido
+88. [112] | Sup: 250 | Precio: 160000 | Prop: 'JONATHAN ELIAS MADERO MORENO' | Estado: vendido
+89. [113] | Sup: 250 | Precio: 160000 | Prop: 'RAYMUNDO GERARDO CONTRERAS HERRERA' | Estado: vendido
+90. [114] | Sup: 250 | Precio: 160000 | Prop: 'JOSÉ LUIS ALADUEÑA HERNÁNDEZ' | Estado: vendido
+91. [115] | Sup: 250 | Precio: 160000 | Prop: 'ESMERALDA BARRAZA FÉLIX' | Estado: vendido
+92. [116] | Sup: 250 | Precio: 160000 | Prop: 'MARÍA DE JESÚS SALDAÑA MARTÍNEZ' | Estado: vendido
+93. [117] | Sup: 250 | Precio: 160000 | Prop: 'JOSÉ ALFREDO CASTELLANO CRECENCIO' | Estado: vendido
+94. [118] | Sup: 250 | Precio: 160000 | Prop: 'ERIKA ASCENCION FELIX OROPEZA' | Estado: vendido
+95. [119] | Sup: 327 | Precio: 220000 | Prop: 'JOSE LUIS GALAZ BRACAMONTES' | Estado: vendido
+96. [120] | Sup: 325 | Precio: 200000 | Prop: 'FRANCISCA RODRIGUEZ GARCIA' | Estado: vendido
+97. [121] | Sup: 250 | Precio: 160000 | Prop: 'FRANCISCA RODRIGUEZ GARCIA' | Estado: vendido
+98. [123] | Sup: 250 | Precio: 160000 | Prop: 'NEREYDA VALENZUELA LOPEZ' | Estado: vendido
+99. [124] | Sup: 250 | Precio: 160000 | Prop: 'SINDI SALDAÑA TINAJERO' | Estado: vendido
+100. [125] | Sup: 250 | Precio: 160000 | Prop: 'LUIS ANGEL FLORES SALDAÑA' | Estado: vendido
+101. [126] | Sup: 250 | Precio: 160000 | Prop: 'CATARINO SURIANO MONTILLO' | Estado: vendido
+102. [127] | Sup: 250 | Precio: 160000 | Prop: 'CATARINO SURIANO MONTILLO' | Estado: vendido
+103. [128] | Sup: 250 | Precio: 160000 | Prop: 'ALFREDO FUENTES PEDROZA' | Estado: vendido
+104. [129] | Sup: 250 | Precio: 160000 | Prop: 'ALFREDO FUENTES PEDROZA' | Estado: vendido
+105. [130] | Sup: 250 | Precio: 160000 | Prop: 'LORENA MACIEL LÓPEZ' | Estado: vendido
+106. [131] | Sup: 250 | Precio: 160000 | Prop: 'LORENA MACIEL LÓPEZ' | Estado: vendido
+107. [132] | Sup: 250 | Precio: 160000 | Prop: 'JUAN PABLO BARRAZA FELIZ' | Estado: vendido
+108. [133] | Sup: 259 | Precio: 160000 | Prop: 'JUAN PABLO BARRAZA FÉLIX' | Estado: vendido
+109. [134] | Sup: 327 | Precio: 220000 | Prop: 'AGUSTIN GUADALUPE ROSAS BRACAMONTES' | Estado: vendido
+110. [135] | Sup: 325 | Precio: 200000 | Prop: 'ANTONIO AGUILERA GRANADOS' | Estado: vendido
+111. [136] | Sup: 250 | Precio: 160000 | Prop: 'LILIAN ROSANGEL FRAGA BANDA' | Estado: vendido
+112. [137] | Sup: 250 | Precio: 160000 | Prop: 'DANIEL ALBERTO CASTAÑEDA LARA' | Estado: vendido
+113. [138] | Sup: 250 | Precio: 160000 | Prop: 'DAYRA GUEVARA ALCALÁ' | Estado: vendido
+114. [139] | Sup: 250 | Precio: 160000 | Prop: 'MIRNA HERNÁNDEZ AMADOR' | Estado: vendido
+115. [140] | Sup: 250 | Precio: 160000 | Prop: 'MIRNA HERNÁNDEZ AMADOR' | Estado: vendido
+116. [141] | Sup: 250 | Precio: 152000 | Prop: 'MIRNA HERNÁNDEZ AMADOR' | Estado: vendido
+117. [142] | Sup: 250 | Precio: 152000 | Prop: 'MIRNA HERNÁNDEZ AMADOR' | Estado: vendido
+118. [143] | Sup: 250 | Precio: 160000 | Prop: 'RAMÓN LORENZO SANTIAGO TINAJERO' | Estado: vendido
+119. [144] | Sup: 250 | Precio: 160000 | Prop: 'ELENA ARACELI FUENTES ZAMARRIPA' | Estado: vendido
+120. [145] | Sup: 250 | Precio: 160000 | Prop: 'ELENA ARACELI FUENTES ZAMARRIPA' | Estado: vendido
+121. [146] | Sup: 250 | Precio: 160000 | Prop: 'MARIA IRMA GONZÁLEZ MOLINA' | Estado: vendido
+122. [147] | Sup: 250 | Precio: 160000 | Prop: 'MARIA IRMA GONZÁLEZ MOLINA' | Estado: vendido
+123. [148] | Sup: 250 | Precio: 160000 | Prop: 'FRANCISCO REYES GALLARDO' | Estado: vendido
+124. [149] | Sup: 327 | Precio: 220000 | Prop: 'BRENDA LETICIA ZEPEDA JAIMES' | Estado: vendido
+125. [201] | Sup: 250 | Precio: 160000 | Prop: 'LUIS VILLANUEVA' | Estado: vendido
+126. [202] | Sup: 250 | Precio: 160000 | Prop: 'LUIS VILLANUEVA' | Estado: vendido
+127. [203] | Sup: 250 | Precio: 160000 | Prop: 'SONIA SANCHEZ SALDAÑA' | Estado: vendido
+128. [204] | Sup: 250 | Precio: 144000 | Prop: 'SONIA SANCHEZ SALDAÑA' | Estado: vendido
+129. [205] | Sup: 298 | Precio: 190000 | Prop: 'JESUS VICENTE VALDERRAMA SANCHEZ' | Estado: vendido
+130. [206] | Sup: 325 | Precio: 220000 | Prop: 'JUAN LUIS CORRALES CANALES' | Estado: apartado
+131. [207] | Sup: 250 | Precio: 160000 | Prop: 'JUAN LUIS CORRALES CANALES' | Estado: apartado
+132. [208] | Sup: 250 | Precio: 160000 | Prop: 'DANIEL ALBERTO CASTAÑEDA LARA' | Estado: vendido
+133. [209] | Sup: 250 | Precio: 160000 | Prop: 'CARMEN DEL ROCIO MARTÍNEZ CHÁVEZ' | Estado: vendido
+134. [210] | Sup: 250 | Precio: 160000 | Prop: 'GUADALUPE GUERRERO AGUAS' | Estado: vendido
+135. [211] | Sup: 250 | Precio: 160000 | Prop: 'JUAN GABRIEL JIMÉNEZ PÁRAMO' | Estado: vendido
+136. [212] | Sup: 250 | Precio: 160000 | Prop: 'NAHUM JIMÉNEZ PÁRAMO' | Estado: vendido
+137. [213] | Sup: 250 | Precio: 160000 | Prop: 'JUAN GABRIEL JIMÉNEZ PÁRAMO' | Estado: vendido
+138. [214] | Sup: 250 | Precio: 160000 | Prop: 'BLANCA ESTELA JARAMILLO GARCÍA' | Estado: vendido
+139. [215] | Sup: 250 | Precio: 160000 | Prop: 'MIGUEL ÁNGEL JIMÉNEZ MOSQUEDA' | Estado: vendido
+140. [216] | Sup: 250 | Precio: 160000 | Prop: 'BLANCA ESTELA JARAMILLO GARCÍA' | Estado: vendido
+141. [217] | Sup: 250 | Precio: 160000 | Prop: 'FRANCISCA RAMOS GÓMEZ' | Estado: vendido
+142. [218] | Sup: 250 | Precio: 160000 | Prop: 'FRANCISCA RAMOS GÓMEZ' | Estado: vendido
+143. [219] | Sup: 250 | Precio: 160000 | Prop: 'VÍCTOR ALBERTO ADAME RAMOS' | Estado: vendido
+144. [220] | Sup: 220 | Precio: 220000 | Prop: 'MARIA CANDELARIA AYALA AGUILAR' | Estado: vendido
+145. [228] | Sup: 250 | Precio: 160000 | Prop: 'LIZBETH ALEJANDRA MOLINA LASCANO' | Estado: vendido
+146. [229] | Sup: 250 | Precio: 160000 | Prop: 'LIZBETH ALEJANDRA MOLINA LASCANO' | Estado: vendido
+147. [230] | Sup: 250 | Precio: 160000 | Prop: 'MAYRA ARREOLA TAPIA' | Estado: vendido
+148. [231] | Sup: 250 | Precio: 160000 | Prop: 'EDUARDO ARREOLA REGALADO' | Estado: vendido
+149. [232] | Sup: 250 | Precio: 160000 | Prop: 'DIEGO ARREOLA TAPIA' | Estado: vendido
+150. [233] | Sup: 250 | Precio: 160000 | Prop: 'DIEGO ARREOLA TAPIA' | Estado: vendido
+151. [234] | Sup: 2204 | Precio: 220000 | Prop: 'JOSE LUIS DE JESUS CONTRERAS' | Estado: vendido
+152. [235] | Sup: 327 | Precio: 220000 | Prop: 'JOSE ISMAEL GUZMAN JIMENEZ' | Estado: vendido
+153. [236] | Sup: 250 | Precio: 160000 | Prop: 'SAÚL NÚÑEZ CASTRO' | Estado: vendido
+154. [237] | Sup: 250 | Precio: 160000 | Prop: 'VERÓNICA ORTEGA ARROYO' | Estado: vendido
+155. [238] | Sup: 250 | Precio: 160000 | Prop: 'VERÓNICA ORTEGA ARROYO' | Estado: vendido
+156. [239] | Sup: 250 | Precio: 160000 | Prop: 'LETICIA JAIMES SOTO' | Estado: vendido
+157. [240] | Sup: 250 | Precio: 160000 | Prop: 'ERICK ALBERTO FLORES CAMACHO' | Estado: vendido
+158. [241] | Sup: 250 | Precio: 160000 | Prop: 'ERICK ALBERTO FLORES CAMACHO' | Estado: vendido
+159. [242] | Sup: 250 | Precio: 160000 | Prop: 'MARCO ANTONIO NEGRETE NÁJERA' | Estado: vendido
+160. [243] | Sup: 250 | Precio: 160000 | Prop: 'MARCO ANTONIO NEGRETE NÁJERA' | Estado: vendido
+161. [244] | Sup: 250 | Precio: 160000 | Prop: 'BRENDA LETICIA ZEPEDA JAIMEZ' | Estado: vendido
+162. [245] | Sup: 250 | Precio: 160000 | Prop: 'ANA MARIA PANTOJA MEZA' | Estado: vendido
+163. [246] | Sup: 250 | Precio: 160000 | Prop: 'ANA MARIA PANTOJA MEZA' | Estado: vendido
+164. [247] | Sup: 250 | Precio: 160000 | Prop: 'ANTONIO CAMARILLO SAAVEDRA' | Estado: vendido
+165. [248] | Sup: 250 | Precio: 160000 | Prop: 'ANTONIO CAMARILLO SAAVEDRA' | Estado: vendido
+166. [249] | Sup: 327 | Precio: 220000 | Prop: 'ANGEL FRANCISCO FUENTES TRUJILLO' | Estado: vendido
+167. [257] | Sup: 250 | Precio: 160000 | Prop: 'RAQUEL CARO VALENZUELA' | Estado: vendido
+168. [258] | Sup: 250 | Precio: 160000 | Prop: 'RAQUEL CARO VALENZUELA' | Estado: vendido
+169. [259] | Sup: 250 | Precio: 160000 | Prop: 'RAQUEL CARO VALENZUELA' | Estado: vendido
+170. [261] | Sup: 250 | Precio: 160000 | Prop: 'RAQUEL CARO VALENZUELA' | Estado: vendido
+171. [262] | Sup: 250 | Precio: 160000 | Prop: 'VICENTE JACINTO TORRES' | Estado: vendido
+172. [263] | Sup: 290 | Precio: 220000 | Prop: 'ADAN GUERRERO GABRIEL' | Estado: apartado
+173. [264] | Sup: 325 | Precio: 220000 | Prop: 'SILVIA RAZO BRAVO' | Estado: vendido
+174. [265] | Sup: 250 | Precio: 160000 | Prop: 'SILVIA RAZO BRAVO' | Estado: vendido
+175. [266] | Sup: 250 | Precio: 160000 | Prop: 'CRISTÓBAL VILLANUEVA MARTÍNEZ' | Estado: vendido
+176. [267] | Sup: 250 | Precio: 160000 | Prop: 'CRISTÓBAL VILLANUEVA MARTÍNEZ' | Estado: vendido
+177. [268] | Sup: 250 | Precio: 160000 | Prop: 'LETICIA JAIMES SOTO' | Estado: vendido
+178. [269] | Sup: 250 | Precio: 160000 | Prop: 'LETICIA JAIMES SOTO' | Estado: vendido
+179. [270] | Sup: 250 | Precio: 160000 | Prop: 'VERÓNICA PÉREZ ARELLANO' | Estado: vendido
+180. [271] | Sup: 250 | Precio: 160000 | Prop: 'OSCAR SUBÍAS RODRÍGUEZ' | Estado: vendido
+181. [272] | Sup: 250 | Precio: 160000 | Prop: 'DANIEL ARÁMBULA LÓPEZ' | Estado: vendido
+182. [273] | Sup: 250 | Precio: 160000 | Prop: 'RODOLFO DÍAZ AMBRIZ' | Estado: vendido
+183. [274] | Sup: 250 | Precio: 160000 | Prop: 'MANUEL CARRAZCO RAMÍREZ' | Estado: vendido
+184. [275] | Sup: 250 | Precio: 160000 | Prop: 'VÍCTOR MANUEL JIMÉNEZ VARGAS' | Estado: vendido
+185. [276] | Sup: 250 | Precio: 160000 | Prop: 'SERGIO JIMÉNEZ MOZQUEDA' | Estado: vendido
+186. [277] | Sup: 250 | Precio: 160000 | Prop: 'SERGIO JIMÉNEZ MOZQUEDA' | Estado: vendido
+187. [278] | Sup: 327 | Precio: 220000 | Prop: 'SEVERIANO CORTES VIZCARRA' | Estado: vendido
+188. [287] | Sup: 250 | Precio: 160000 | Prop: 'MARIA DE LA LUZ SORIANO HERRERA' | Estado: vendido
+189. [288] | Sup: 250 | Precio: 160000 | Prop: 'MARIA DE LA LUZ SORIANO HERRERA' | Estado: vendido
+190. [289] | Sup: 250 | Precio: 160000 | Prop: 'MARIA DE LA LUZ SORIANO HERRERA' | Estado: vendido
+191. [290] | Sup: 250 | Precio: 160000 | Prop: 'GUADALUPE GÓMEZ MORENO' | Estado: vendido
+192. [291] | Sup: 0 | Precio: 0 | Prop: '$650.00' | Estado: vendido
+193. [292] | Sup: 250 | Precio: 160000 | Prop: 'ANITA BRISEÑO' | Estado: vendido
+194. [293] | Sup: 298 | Precio: 210000 | Prop: 'LETICIA JAIMES SOTO' | Estado: vendido
+195. [294] | Sup: 325 | Precio: 220000 | Prop: 'ZAMIRA ROMERO GUZMAN' | Estado: vendido
+196. [295] | Sup: 250 | Precio: 160000 | Prop: 'MELISSA HUERTA ROMERO' | Estado: vendido
+197. [296] | Sup: 250 | Precio: 160000 | Prop: 'JULIANA HUERTA ROMERO' | Estado: vendido
+198. [298] | Sup: 250 | Precio: 160000 | Prop: 'MARIA ISABEL GAMEZ SANDOVAL' | Estado: vendido
+199. [299] | Sup: 250 | Precio: 160000 | Prop: 'KARLA GUADALUPE QUINTERO CERVANTES' | Estado: vendido
+200. [300] | Sup: 250 | Precio: 160000 | Prop: 'TEODORA FÉLIX ARELLANO' | Estado: vendido
+201. [301] | Sup: 250 | Precio: 160000 | Prop: 'IVAN GONZÁLEZ URIBE' | Estado: vendido
+202. [302] | Sup: 250 | Precio: 160000 | Prop: 'THALÍA LIZETTE ROMERO MUÑOZ' | Estado: vendido
+203. [303] | Sup: 250 | Precio: 160000 | Prop: 'THALÍA LIZETTE ROMERO MUÑOZ' | Estado: vendido
+204. [304] | Sup: 250 | Precio: 160000 | Prop: 'OLGA LIDIA VILLEGAS RUIZ' | Estado: vendido
+205. [305] | Sup: 250 | Precio: 160000 | Prop: 'CARLOS URÍAS PÉREZ' | Estado: vendido
+206. [260] | Sup: 250 | Precio: 160000 | Prop: 'RAQUEL CARO VALENZUELA' | Estado: vendido
+207. [T1] | Sup: 398.27 | Precio: 260000 | Prop: 'null' | Estado: disponible
+208. [T2] | Sup: 501.65 | Precio: 330000 | Prop: 'null' | Estado: disponible
+209. [T3] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+210. [T4] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+211. [T5] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+212. [T6] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+213. [T7] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+214. [T8] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+215. [T9] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+216. [T10] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+217. [T11] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+218. [T12] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+219. [T13] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+220. [T14] | Sup: 511.4 | Precio: 332410 | Prop: 'null' | Estado: disponible
+221. [T15] | Sup: 740.37 | Precio: 485000 | Prop: 'null' | Estado: disponible
+222. [T16] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+223. [T17] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+224. [T18] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+225. [T19] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+226. [T20] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+227. [T21] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+228. [T22] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+229. [T23] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+230. [T24] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+231. [T25] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+232. [T26] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+233. [T27] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+234. [T28] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+235. [T29] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+236. [T30] | Sup: 763.39 | Precio: 496000 | Prop: 'null' | Estado: disponible
+237. [T31] | Sup: 743.76 | Precio: 490000 | Prop: 'null' | Estado: disponible
+238. [T32] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+239. [T33] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+240. [T34] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+241. [T35] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+242. [T36] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+243. [T37] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+244. [T38] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+245. [T39] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+246. [T40] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+247. [T41] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+248. [T42] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+249. [T43] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+250. [T44] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+251. [T45] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+252. [T46] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+253. [T47] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+254. [T48] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+255. [T49] | Sup: 373.02 | Precio: 242000 | Prop: 'null' | Estado: disponible
+256. [T50] | Sup: 413.97 | Precio: 275000 | Prop: 'null' | Estado: disponible
+257. [T51] | Sup: 479 | Precio: 320000 | Prop: 'null' | Estado: disponible
+258. [T52] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+259. [T53] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+260. [T54] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+261. [T55] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+262. [T56] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+263. [T57] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+264. [T58] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+265. [T59] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+266. [T60] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+267. [T61] | Sup: 308.76 | Precio: 200000 | Prop: 'null' | Estado: disponible
+268. [T62] | Sup: 303.26 | Precio: 197000 | Prop: 'null' | Estado: disponible
+269. [T63] | Sup: 279.35 | Precio: 182000 | Prop: 'null' | Estado: disponible
+270. [T64] | Sup: 253.96 | Precio: 165000 | Prop: 'null' | Estado: disponible
+271. [T65] | Sup: 659.92 | Precio: 429000 | Prop: 'null' | Estado: apartado
+272. [GUILLERMO CASTILLO PEREZ] | Sup: 0 | Precio: 0 | Prop: '379.05' | Estado: vendido
+273. [CARLOS ARMANDO MENDOZA MENDOZA] | Sup: 0 | Precio: 0 | Prop: '250' | Estado: vendido
+274. [LOTE-IMP-16] | Sup: 0 | Precio: 0 | Prop: '250' | Estado: vendido
+275. [JUAN VARELA CANCHOLA] | Sup: 0 | Precio: 0 | Prop: '250' | Estado: vendido
+276. [GILBERTO FELIX SOTO] | Sup: 0 | Precio: 0 | Prop: '250' | Estado: vendido
+277. [ARIANA BELTRAN VALDIVIA] | Sup: 0 | Precio: 0 | Prop: '298' | Estado: vendido
+278. [GEORGINA BELTRAN VALDIVIA] | Sup: 0 | Precio: 0 | Prop: '250' | Estado: vendido
+279. [ANA VICTORIA VALDIVIA GARCIA] | Sup: 0 | Precio: 0 | Prop: '298' | Estado: vendido
+280. [ULISES RIOS BRAVO] | Sup: 0 | Precio: 0 | Prop: '298' | Estado: vendido
+281. [HERIBERTO VALLEJO RUIZ] | Sup: 0 | Precio: 0 | Prop: '298' | Estado: vendido
+282. [ANA CRISTINA GASCA ALCANTAR] | Sup: 0 | Precio: 0 | Prop: '250' | Estado: vendido
+283. [CARLOS JUAREZ PEREZ] | Sup: 0 | Precio: 0 | Prop: '298' | Estado: vendido
+284. [SAMANTHA ADILENE AVALOS DIAZ] | Sup: 0 | Precio: 0 | Prop: '402.75' | Estado: vendido
+285. [MARIA GRACIELA RAMOS V] | Sup: 0 | Precio: 0 | Prop: '402.75' | Estado: vendido
+286. [CARMINA RIVERA INZUNZA] | Sup: 0 | Precio: 0 | Prop: '402.75' | Estado: vendido
+287. [OSCAR CABANILLAS AYOQUI] | Sup: 0 | Precio: 0 | Prop: '250' | Estado: vendido
+288. [ROSALBA RAMIREZ DELGADO] | Sup: 0 | Precio: 0 | Prop: '402.75' | Estado: vendido
+289. [RITA RODRIGUEZ BRETADO] | Sup: 0 | Precio: 0 | Prop: '402.75' | Estado: vendido
+290. [YESSICA ALVAREZ RODRIGUEZ] | Sup: 0 | Precio: 0 | Prop: '402.75' | Estado: vendido
+291. [MARIA AMELIA EMA VALDIVIA GARCIA] | Sup: 0 | Precio: 0 | Prop: '325' | Estado: vendido
+292. [ADILENE CRUZ MORALES] | Sup: 0 | Precio: 0 | Prop: '250' | Estado: vendido
+293. [LOTE-IMP-77] | Sup: 0 | Precio: 0 | Prop: '250' | Estado: vendido
+294. [LOTE-IMP-78] | Sup: 0 | Precio: 0 | Prop: '250' | Estado: vendido
+295. [EVELYN VALVIDARES SUAREZ] | Sup: 0 | Precio: 0 | Prop: '250' | Estado: vendido
+296. [JOSE RUBEN CORONA CASTRO] | Sup: 0 | Precio: 0 | Prop: '250' | Estado: vendido
+297. [MARIA FRANCISCA ARECHIGA VILLAREAL] | Sup: 0 | Precio: 0 | Prop: '250' | Estado: vendido
+298. [ABRAHAM BANDA SIMENTAL] | Sup: 0 | Precio: 0 | Prop: '250' | Estado: vendido
+299. [LOTE-IMP-84] | Sup: 0 | Precio: 0 | Prop: '250' | Estado: vendido
+300. [LOTE-IMP-85] | Sup: 0 | Precio: 0 | Prop: '250' | Estado: vendido
+301. [MIGUEL HERRERA SANCHEZ] | Sup: 0 | Precio: 0 | Prop: '250' | Estado: vendido
+302. [MARIA DEL ROSARIO LARA CORONADO] | Sup: 0 | Precio: 0 | Prop: '250' | Estado: vendido
+303. [CECILIA LARA GARCIA] | Sup: 0 | Precio: 0 | Prop: '250' | Estado: vendido
+304. [SANDRA GUADALUPE CARDENAS ESQUER] | Sup: 0 | Precio: 0 | Prop: '327' | Estado: vendido
+305. [LIDIA VALDIVIA SANCHEZ] | Sup: 0 | Precio: 0 | Prop: '325' | Estado: vendido
+306. [BRAYAN MORGA LOPEZ] | Sup: 0 | Precio: 0 | Prop: '250' | Estado: vendido
+307. [JOSE GUADALUPE LARA FERNANDEZ] | Sup: 0 | Precio: 0 | Prop: '327' | Estado: vendido

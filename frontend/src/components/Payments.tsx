@@ -23,6 +23,7 @@ const Payments: React.FC<PaymentsProps> = ({ onViewMorosos }) => {
   const [terrenos, setTerrenos] = useState<Terreno[]>([]);
   const [planes, setPlanes] = useState<PlanPago[]>([]);
   const [egresos, setEgresos] = useState<Egreso[]>([]);
+  const [comisionPct, setComisionPct] = useState(6.75);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -34,12 +35,18 @@ const Payments: React.FC<PaymentsProps> = ({ onViewMorosos }) => {
       const parcelaId = localStorage.getItem('selected_parcela') || '';
       const userRole = (localStorage.getItem('user_role') || '').toLowerCase();
       
-      const [abonosData, terrenosData, planesData, egresosData] = await Promise.all([
+      const [abonosData, terrenosData, planesData, egresosData, parcelasData] = await Promise.all([
         api.abonos.getAll(),
         api.terrenos.getAll(),
         api.planesPago.getAll(),
-        parcelaId ? api.egresos.getAll(parcelaId) : Promise.resolve([])
+        parcelaId ? api.egresos.getAll(parcelaId) : Promise.resolve([]),
+        api.parcelas.getAll()
       ]);
+
+      const currentP = (parcelasData || []).find(p => p.id === parcelaId);
+      if (currentP && currentP.comision_base !== undefined) {
+        setComisionPct(currentP.comision_base);
+      }
       
       let filteredAbonos = abonosData || [];
       let filteredTerrenos = terrenosData || [];
@@ -89,7 +96,7 @@ const Payments: React.FC<PaymentsProps> = ({ onViewMorosos }) => {
   }, 0);
   
   const totalEgresos = (egresos || []).reduce((acc, curr) => acc + (Number(curr.monto) || 0), 0);
-  const comisiones = totalCobros * 0.0675;
+  const comisiones = totalCobros * (comisionPct / 100);
   const utilidadNeta = totalCobros - totalEgresos - comisiones;
 
 
@@ -173,7 +180,7 @@ const Payments: React.FC<PaymentsProps> = ({ onViewMorosos }) => {
               <span className="text-base font-black text-blue-900">${totalCobros.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
             </div>
             <div className="flex justify-between items-center border-b border-blue-200/50 pb-2">
-              <span className="text-sm font-semibold text-red-600">Comisiones (6.75%)</span>
+              <span className="text-sm font-semibold text-red-600">Comisiones ({comisionPct}%)</span>
               <span className="text-base font-black text-red-600">-${comisiones.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
             </div>
             <div className="flex justify-between items-center border-b border-blue-200/50 pb-2">

@@ -4,6 +4,7 @@ import { useTerrenos } from '../hooks/useTerrenos';
 import type { Terreno, TerrenoInput } from '../lib/api';
 import TerrenoModal from './TerrenoModal';
 import ConfirmModal from './ConfirmModal';
+import ImportExcelButton from './ImportExcelButton';
 
 const ESTADOS = ['Todos', 'disponible', 'apartado', 'vendido'] as const;
 const PAGE_SIZE = 10;
@@ -103,6 +104,9 @@ const LandCatalog: React.FC<LandCatalogProps> = ({ searchQuery = '', onSelectTer
           >
             <RefreshCw size={18} className={loading ? 'animate-spin text-orange-500' : ''} />
           </button>
+          
+          <ImportExcelButton onSuccess={refresh} />
+
           <button
             onClick={handleNuevoLote}
             className="flex items-center gap-2 bg-gradient-to-r from-orange-600 to-orange-500 text-white px-5 py-2.5 rounded-xl font-medium hover:from-orange-700 hover:to-orange-600 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"

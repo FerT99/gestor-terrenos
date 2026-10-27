@@ -23,8 +23,10 @@ const TerrenoDetail: React.FC<TerrenoDetailProps> = ({ terrenoId, onBack }) => {
   const [uploadingAbonoId, setUploadingAbonoId] = useState<string | null>(null);
   
   const [vendedores, setVendedores] = useState<Usuario[]>([]);
+  const [listaClientes, setListaClientes] = useState<Cliente[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isUpdatingVendedor, setIsUpdatingVendedor] = useState(false);
+  const [isUpdatingPropietario, setIsUpdatingPropietario] = useState(false);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, abonoId: string) => {
     const file = e.target.files?.[0];
@@ -61,7 +63,7 @@ const TerrenoDetail: React.FC<TerrenoDetailProps> = ({ terrenoId, onBack }) => {
     try {
       setLoading(true);
       const clientes = await api.clientes.getAll();
-      const cliente = clientes.find(c => c.nombre_completo === terreno.propietario);
+      const cliente = (clientes || []).find(c => c.nombre_completo === terreno.propietario);
       if (!cliente) {
         throw new Error(`No se encontró el cliente "${terreno.propietario}". Debes asignar un cliente válido.`);
       }
@@ -101,18 +103,28 @@ const TerrenoDetail: React.FC<TerrenoDetailProps> = ({ terrenoId, onBack }) => {
           api.clientes.getAll()
         ]);
 
-        const currentTerreno = terrenosData.find(t => t.id === terrenoId);
+        const sortedClientes = [...(clientesData || [])].sort((a, b) => 
+          (a.nombre_completo || '').localeCompare(b.nombre_completo || '')
+        );
+        setListaClientes(sortedClientes);
+
+        const currentTerreno = (terrenosData || []).find(t => t.id === terrenoId);
         if (!currentTerreno) throw new Error('Terreno no encontrado');
         setTerreno(currentTerreno);
         
-        if (currentTerreno.propietario) {
-          const currentCliente = clientesData.find(c => c.nombre_completo === currentTerreno.propietario);
-          if (currentCliente) {
-            setCliente(currentCliente);
-          }
+        let currentCliente: Cliente | null = null;
+        if (currentTerreno.propietario && currentTerreno.propietario.trim() !== '') {
+          currentCliente = (clientesData || []).find(c => 
+            (c.nombre_completo || '').trim().toLowerCase() === currentTerreno.propietario!.trim().toLowerCase()
+          ) || null;
         }
+        setCliente(currentCliente);
 
-        const currentPlan = planesData.find(p => p.terreno_id === terrenoId);
+        // El plan de pago activo debe pertenecer a este terreno y al cliente propietario actual
+        const currentPlan = currentCliente 
+          ? (planesData || []).find(p => p.terreno_id === terrenoId && p.cliente_id === currentCliente.id)
+          : null;
+
         if (currentPlan) {
           setPlan(currentPlan);
           
@@ -121,11 +133,14 @@ const TerrenoDetail: React.FC<TerrenoDetailProps> = ({ terrenoId, onBack }) => {
           
           // Fetch all abonos once to avoid database connection limits
           const todosLosAbonos = await api.abonos.getAll();
-          const periodosIds = periodosData.map(p => p.id);
-          const filteredAbonos = todosLosAbonos.filter(a => periodosIds.includes(a.periodo_pago_id));
+          const periodosIds = (periodosData || []).map(p => p.id);
+          const filteredAbonos = (todosLosAbonos || []).filter(a => periodosIds.includes(a.periodo_pago_id));
           
           filteredAbonos.sort((a, b) => (a.numero_abono || 0) - (b.numero_abono || 0));
           setAbonos(filteredAbonos);
+        } else {
+          setPlan(null);
+          setAbonos([]);
         }
 
         const userRole = (localStorage.getItem('user_role') || '').toLowerCase();
@@ -133,7 +148,7 @@ const TerrenoDetail: React.FC<TerrenoDetailProps> = ({ terrenoId, onBack }) => {
           setIsAdmin(true);
           try {
             const allUsers = await api.usuarios.getAll();
-            setVendedores(allUsers.filter(u => u.rol === 'vendedor' || u.rol === 'asesor'));
+            setVendedores((allUsers || []).filter(u => u.rol === 'vendedor' || u.rol === 'asesor'));
           } catch (e) {
             console.error("No se pudo cargar la lista de vendedores", e);
           }
@@ -153,6 +168,42 @@ const TerrenoDetail: React.FC<TerrenoDetailProps> = ({ terrenoId, onBack }) => {
   const handlePaymentSuccess = () => {
     setIsPaymentModalOpen(false);
     fetchData();
+  };
+
+  const handleAsignarPropietario = async (propietarioNombre: string) => {
+    if (!terreno) return;
+    try {
+      setIsUpdatingPropietario(true);
+
+      let nuevoEstado = terreno.estado;
+      if (propietarioNombre && propietarioNombre.trim() !== '') {
+        if (terreno.estado.toLowerCase() === 'disponible') {
+          nuevoEstado = 'vendido';
+        }
+      } else {
+        nuevoEstado = 'disponible';
+      }
+
+      await api.terrenos.update(terreno.id, {
+        clave: terreno.clave,
+        nombre: terreno.nombre || '',
+        fase: terreno.fase || '',
+        superficie_m2: terreno.superficie_m2,
+        precio_lista: terreno.precio_lista,
+        propietario: propietarioNombre,
+        estado: nuevoEstado,
+        coordenadas: terreno.coordenadas || '',
+        notas: terreno.notas || '',
+        moneda: 'MXN',
+        vendedor_id: terreno.vendedor_id
+      });
+
+      await fetchData();
+    } catch (e: any) {
+      alert("Error al asignar propietario: " + (e.message || ""));
+    } finally {
+      setIsUpdatingPropietario(false);
+    }
   };
 
   const handleAsignarVendedor = async (vendedorId: string) => {
@@ -260,8 +311,28 @@ const TerrenoDetail: React.FC<TerrenoDetailProps> = ({ terrenoId, onBack }) => {
             <span className="text-lg font-semibold text-emerald-600">${terreno.precio_lista.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span>
           </div>
           <div>
-            <span className="block text-sm font-medium text-neutral-400 mb-1">Propietario Actual</span>
-            <span className="text-lg font-semibold text-neutral-800">{terreno.propietario || 'Sin asignar'}</span>
+            <div className="flex items-center justify-between mb-1">
+              <span className="block text-sm font-medium text-neutral-400">Propietario Actual</span>
+              {isUpdatingPropietario && (
+                <span className="text-xs text-orange-500 font-medium animate-pulse">Guardando...</span>
+              )}
+            </div>
+            <select 
+              className="w-full text-sm border-b border-neutral-200 bg-transparent pb-1 text-neutral-800 font-medium focus:outline-none focus:border-orange-500 cursor-pointer disabled:opacity-50"
+              value={terreno.propietario || ''}
+              onChange={(e) => handleAsignarPropietario(e.target.value)}
+              disabled={isUpdatingPropietario}
+            >
+              <option value="">-- Sin asignar --</option>
+              {terreno.propietario && !listaClientes.some(c => c.nombre_completo === terreno.propietario) && (
+                <option value={terreno.propietario}>{terreno.propietario} (Actual)</option>
+              )}
+              {listaClientes.map(c => (
+                <option key={c.id} value={c.nombre_completo}>
+                  {c.nombre_completo}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <span className="block text-sm font-medium text-neutral-400 mb-1">Vendedor Asignado</span>
@@ -273,13 +344,13 @@ const TerrenoDetail: React.FC<TerrenoDetailProps> = ({ terrenoId, onBack }) => {
                 disabled={isUpdatingVendedor}
               >
                 <option value="">-- Ninguno --</option>
-                {vendedores.map(v => (
+                {(vendedores || []).map(v => (
                   <option key={v.id} value={v.id}>{v.nombre_completo || v.nombre || v.email}</option>
                 ))}
               </select>
             ) : (
               <span className="text-lg font-semibold text-neutral-800">
-                {vendedores.find(v => v.id === terreno.vendedor_id)?.nombre_completo || 'Sin asignar'}
+                {(vendedores || []).find(v => v.id === terreno.vendedor_id)?.nombre_completo || 'Sin asignar'}
               </span>
             )}
           </div>

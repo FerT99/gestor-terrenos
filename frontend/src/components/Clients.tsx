@@ -26,10 +26,10 @@ const Clients: React.FC<ClientsProps> = ({ searchQuery = '', onSelectCliente }) 
   const fetchClientes = async () => {
     try {
       setLoading(true);
-      const [clientesData, morososData, planesData] = await Promise.all([
+      const [clientesData, morososData, terrenosData] = await Promise.all([
         api.clientes.getAll(),
         api.reportes.getMorosos(),
-        api.planesPago.getAll()
+        api.terrenos.getAll()
       ]);
       setClientes(clientesData);
 
@@ -37,8 +37,13 @@ const Clients: React.FC<ClientsProps> = ({ searchQuery = '', onSelectCliente }) 
       setMorososIds(morososSet);
 
       const lotesMap: Record<string, number> = {};
-      (planesData || []).forEach(p => {
-        lotesMap[p.cliente_id] = (lotesMap[p.cliente_id] || 0) + 1;
+      (clientesData || []).forEach(c => {
+        const clientName = (c.nombre_completo || '').trim().toLowerCase();
+        const count = (terrenosData || []).filter(t => 
+          t.estado?.toLowerCase() !== 'disponible' &&
+          (t.propietario || '').trim().toLowerCase() === clientName
+        ).length;
+        lotesMap[c.id] = count;
       });
       setClientLotesCount(lotesMap);
     } catch (err) {

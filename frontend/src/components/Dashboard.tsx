@@ -16,6 +16,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onViewMorosos, onViewTerreno }) =
 
   const [morosos, setMorosos] = useState<ClienteMoroso[]>([]);
   const [egresos, setEgresos] = useState<Egreso[]>([]);
+  const [comisionPct, setComisionPct] = useState<number>(6.75);
   const [exchangeRate, setExchangeRate] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [selectedMonthDetails, setSelectedMonthDetails] = useState<{month: number, year: number} | null>(null);
@@ -29,12 +30,18 @@ const Dashboard: React.FC<DashboardProps> = ({ onViewMorosos, onViewTerreno }) =
         const parcelaId = localStorage.getItem('selected_parcela') || '';
         const userRole = (localStorage.getItem('user_role') || '').toLowerCase();
         
-        const [abonosData, morososData, egresosData, terrenosData] = await Promise.all([
+        const [abonosData, morososData, egresosData, terrenosData, parcelasData] = await Promise.all([
           api.abonos.getAll(),
           api.reportes.getMorosos(),
           parcelaId ? api.egresos.getAll(parcelaId) : Promise.resolve([]),
           api.terrenos.getAll(),
+          api.parcelas.getAll()
         ]);
+
+        const currentP = (parcelasData || []).find(p => p.id === parcelaId);
+        if (currentP && currentP.comision_base !== undefined) {
+          setComisionPct(currentP.comision_base);
+        }
 
         let filteredAbonos = abonosData || [];
         let filteredMorosos = morososData || [];
@@ -130,7 +137,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onViewMorosos, onViewTerreno }) =
   });
 
   const utilidadNetaMes = mxnSum - egresosMes;
-  const comisionesHistorico = ingresosTotalesHistorico * 0.0675;
+  const comisionesHistorico = ingresosTotalesHistorico * (comisionPct / 100);
   const ingresosNetosHistorico = ingresosTotalesHistorico - comisionesHistorico;
 
   // Calculate Adeudos Vencidos

@@ -25,17 +25,25 @@ const ClientDetail: React.FC<ClientDetailProps> = ({ clienteId, onBack, onViewTe
           api.terrenos.getAll()
         ]);
 
-        const currentClient = clientesData.find(c => c.id === clienteId);
+        const currentClient = (clientesData || []).find(c => c.id === clienteId);
         if (!currentClient) throw new Error('Cliente no encontrado');
         setCliente(currentClient);
 
-        // Planes que pertenecen a este cliente
-        const clientPlanes = planesData.filter(p => p.cliente_id === clienteId);
-        setPlanes(clientPlanes);
+        const clientName = (currentClient.nombre_completo || '').trim().toLowerCase();
 
-        // Terrenos de esos planes
-        const terrenoIds = clientPlanes.map(p => p.terreno_id);
-        setTerrenos(terrenosData.filter(t => terrenoIds.includes(t.id)));
+        // Terrenos asignados activamente a este cliente
+        const terrenosDelCliente = (terrenosData || []).filter(t => 
+          t.estado?.toLowerCase() !== 'disponible' &&
+          (t.propietario || '').trim().toLowerCase() === clientName
+        );
+        setTerrenos(terrenosDelCliente);
+
+        // Planes que corresponden a este cliente y a los terrenos actualmente asignados
+        const terrenoIds = new Set(terrenosDelCliente.map(t => t.id));
+        const clientPlanes = (planesData || []).filter(p => 
+          p.cliente_id === clienteId && terrenoIds.has(p.terreno_id)
+        );
+        setPlanes(clientPlanes);
 
       } catch (err: any) {
         setError(err.message || 'Error al cargar los detalles del cliente.');
@@ -74,11 +82,11 @@ const ClientDetail: React.FC<ClientDetailProps> = ({ clienteId, onBack, onViewTe
     );
   }
 
-  // Combinar la información de los planes con la de los terrenos para iterar más fácil
-  const lotesAsignados = planes.map(plan => {
-    const terreno = terrenos.find(t => t.id === plan.terreno_id);
+  // Combinar los terrenos actualmente asignados al cliente con su plan de pago (si existe)
+  const lotesAsignados = (terrenos || []).map(terreno => {
+    const plan = (planes || []).find(p => p.terreno_id === terreno.id);
     return { plan, terreno };
-  }).filter(({ terreno }) => terreno && terreno.estado !== 'disponible');
+  });
 
   return (
     <div className="p-6 md:p-10 max-w-5xl mx-auto min-h-[calc(100vh-4rem)]">
@@ -169,53 +177,53 @@ const ClientDetail: React.FC<ClientDetailProps> = ({ clienteId, onBack, onViewTe
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {lotesAsignados.map(({ plan, terreno }) => (
             <div 
-              key={plan.id} 
-              onClick={() => terreno && onViewTerreno?.(terreno.id)}
-              className={`bg-white rounded-2xl shadow-sm border border-neutral-200 p-6 flex flex-col transition-shadow ${onViewTerreno && terreno ? 'cursor-pointer hover:shadow-md' : ''}`}
+              key={terreno.id} 
+              onClick={() => onViewTerreno?.(terreno.id)}
+              className={`bg-white rounded-2xl shadow-sm border border-neutral-200 p-6 flex flex-col transition-shadow ${onViewTerreno ? 'cursor-pointer hover:shadow-md' : ''}`}
             >
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <span className="inline-block px-2 py-1 bg-orange-100 text-orange-700 text-xs font-bold rounded mb-2">
-                    LOTE {terreno?.clave || plan.terreno_nombre || 'Desconocido'}
+                    LOTE {terreno.clave || (plan && plan.terreno_nombre) || 'Desconocido'}
                   </span>
-                  {terreno?.nombre && <h3 className="text-lg font-bold text-neutral-900">{terreno.nombre}</h3>}
+                  {terreno.nombre && <h3 className="text-lg font-bold text-neutral-900">{terreno.nombre}</h3>}
                 </div>
                 <div className="text-right">
                   <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${
-                    plan.estado === 'Activo' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                    (plan?.estado === 'Activo' || (!plan && terreno.estado !== 'disponible')) ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
                     'bg-neutral-50 text-neutral-700 border-neutral-200'
                   }`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${
-                      plan.estado === 'Activo' ? 'bg-emerald-500' : 'bg-neutral-500'
+                      (plan?.estado === 'Activo' || (!plan && terreno.estado !== 'disponible')) ? 'bg-emerald-500' : 'bg-neutral-500'
                     }`}></span>
-                    {plan.estado}
+                    {plan?.estado || terreno.estado.toUpperCase()}
                   </span>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4 mt-auto pt-4 border-t border-neutral-100">
                 <div>
-                  <span className="block text-[10px] uppercase font-bold text-neutral-400 mb-1">Monto de Venta</span>
+                  <span className="block text-[10px] uppercase font-bold text-neutral-400 mb-1">Monto {plan ? 'de Venta' : 'de Lista'}</span>
                   <span className="text-lg font-bold text-neutral-800">
-                    ${plan.monto_total.toLocaleString('es-MX', {minimumFractionDigits: 2})}
+                    ${(plan ? plan.monto_total : terreno.precio_lista).toLocaleString('es-MX', {minimumFractionDigits: 2})}
                   </span>
                 </div>
                 <div>
                   <span className="block text-[10px] uppercase font-bold text-neutral-400 mb-1">Enganche</span>
                   <span className="text-lg font-bold text-neutral-800">
-                    ${plan.enganche.toLocaleString('es-MX', {minimumFractionDigits: 2})}
+                    ${(plan ? plan.enganche : 0).toLocaleString('es-MX', {minimumFractionDigits: 2})}
                   </span>
                 </div>
                 <div>
                   <span className="block text-[10px] uppercase font-bold text-neutral-400 mb-1">Plazos Restantes</span>
                   <span className="text-sm font-semibold text-neutral-600">
-                    {plan.plazos} meses
+                    {plan ? `${plan.plazos} meses` : 'Por definir'}
                   </span>
                 </div>
                 <div>
                   <span className="block text-[10px] uppercase font-bold text-neutral-400 mb-1">Superficie</span>
                   <span className="text-sm font-semibold text-neutral-600">
-                    {terreno ? `${Number(terreno.superficie_m2).toFixed(2)} m²` : '---'}
+                    {`${Number(terreno.superficie_m2).toFixed(2)} m²`}
                   </span>
                 </div>
               </div>

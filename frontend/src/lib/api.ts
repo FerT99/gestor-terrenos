@@ -113,7 +113,14 @@ export interface Parcela {
   id: string;
   nombre: string;
   descripcion: string;
+  comision_base?: number;
   created_at: string;
+}
+
+export interface ParcelaInput {
+  nombre: string;
+  descripcion?: string;
+  comision_base?: number;
 }
 
 export interface PeriodoPago {
@@ -208,23 +215,42 @@ export interface Usuario {
   nombre_completo?: string;
   nombre: string;
   rol: string;
+  parcelas_asignadas?: string[];
   created_at: string;
 }
+
+
+export interface Configuracion {
+  id?: number;
+  razon_social: string;
+  rfc: string;
+  direccion_fiscal: string;
+  email_soporte: string;
+  telefono_contacto: string;
+  comision_base: number;
+  porcentaje_mora: number;
+  permitir_dias_gracia: boolean;
+  dias_gracia: number;
+  tipo_cambio_usd: number;
+  tipo_cambio_actualizado_at: string;
+  idioma: string;
+  notificaciones_email: boolean;
+  notificaciones_slack: boolean;
+  updated_at?: string;
+}
+
+export type ConfiguracionInput = Partial<Configuracion>;
 
 export const api = {
   parcelas: {
     getAll: async (): Promise<Parcela[]> => {
-      const { data: { session } } = await supabase.auth.getSession();
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (session?.access_token) {
-        headers['Authorization'] = `Bearer ${session.access_token}`;
-      }
+      const headers = await getAuthHeaders();
       const res = await fetch(`${API_URL}/api/v1/parcelas`, { headers });
       if (!res.ok) throw new Error('Error al obtener parcelas');
       const json = await res.json();
-      return json.data as Parcela[];
+      return (json.data ?? []) as Parcela[];
     },
-    create: async (input: { nombre: string; descripcion: string }): Promise<Parcela> => {
+    create: async (input: ParcelaInput): Promise<Parcela> => {
       const { data: { session } } = await supabase.auth.getSession();
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (session?.access_token) {
@@ -238,6 +264,21 @@ export const api = {
       if (!res.ok) throw new Error('Error al crear parcela');
       const json = await res.json();
       return json.data as Parcela;
+    },
+    update: async (id: string, input: Partial<ParcelaInput>): Promise<Parcela> => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+      const res = await fetch(`${API_URL}/api/v1/parcelas/${id}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(input)
+      });
+      if (!res.ok) throw new Error('Error al actualizar parcela');
+      const json = await res.json();
+      return json.data as Parcela;
     }
   },
 
@@ -247,7 +288,7 @@ export const api = {
       const res = await fetch(`${API_URL}/api/v1/terrenos`, { headers });
       if (!res.ok) throw new Error('Error al obtener terrenos');
       const json = await res.json();
-      return json.data as Terreno[];
+      return (json.data ?? []) as Terreno[];
     },
 
     create: async (input: TerrenoInput): Promise<Terreno> => {
@@ -296,7 +337,7 @@ export const api = {
       const res = await fetch(`${API_URL}/api/v1/clientes`, { headers });
       if (!res.ok) throw new Error('Error al obtener clientes');
       const json = await res.json();
-      return json.data as Cliente[];
+      return (json.data ?? []) as Cliente[];
     },
 
     create: async (input: ClienteInput): Promise<Cliente> => {
@@ -345,7 +386,7 @@ export const api = {
       const res = await fetch(`${API_URL}/api/v1/planes-pago`, { headers });
       if (!res.ok) throw new Error('Error al obtener planes de pago');
       const json = await res.json();
-      return json.data as PlanPago[];
+      return (json.data ?? []) as PlanPago[];
     },
 
     create: async (input: PlanPagoInput): Promise<PlanPago> => {
@@ -368,7 +409,7 @@ export const api = {
       const res = await fetch(`${API_URL}/api/v1/planes-pago/${planId}/periodos`, { headers });
       if (!res.ok) throw new Error('Error al obtener periodos');
       const json = await res.json();
-      return json.data as PeriodoPago[];
+      return (json.data ?? []) as PeriodoPago[];
     }
   },
 
@@ -378,7 +419,7 @@ export const api = {
       const res = await fetch(`${API_URL}/api/v1/abonos`, { headers });
       if (!res.ok) throw new Error('Error al obtener todos los abonos');
       const json = await res.json();
-      return json.data as Abono[];
+      return (json.data ?? []) as Abono[];
     },
     create: async (input: AbonoInput): Promise<Abono> => {
       const headers = await getAuthHeaders();
@@ -399,7 +440,7 @@ export const api = {
       const res = await fetch(`${API_URL}/api/v1/periodos/${periodoId}/abonos`, { headers });
       if (!res.ok) throw new Error('Error al obtener abonos');
       const json = await res.json();
-      return json.data as Abono[];
+      return (json.data ?? []) as Abono[];
     },
     uploadComprobante: async (file: File): Promise<string> => {
       const fileExt = file.name.split('.').pop();
@@ -465,7 +506,7 @@ export const api = {
       const res = await fetch(`${API_URL}/api/v1/parcelas/${parcelaId}/egresos`, { headers });
       if (!res.ok) throw new Error('Error al obtener egresos');
       const json = await res.json();
-      return json.data as Egreso[];
+      return (json.data ?? []) as Egreso[];
     },
     create: async (parcelaId: string, input: EgresoInput): Promise<Egreso> => {
       const headers = await getAuthHeaders();
@@ -511,7 +552,7 @@ export const api = {
       const res = await fetch(`${API_URL}/api/v1/audit-logs`, { headers });
       if (!res.ok) throw new Error('Error al obtener audit logs');
       const json = await res.json();
-      return json.data as AuditLog[];
+      return (json.data ?? []) as AuditLog[];
     }
   },
   reportes: {
@@ -520,7 +561,7 @@ export const api = {
       const res = await fetch(`${API_URL}/api/v1/reportes/morosos`, { headers });
       if (!res.ok) throw new Error('Error al obtener clientes morosos');
       const json = await res.json();
-      return json.data as ClienteMoroso[];
+      return (json.data ?? []) as ClienteMoroso[];
     }
   },
 
@@ -530,7 +571,7 @@ export const api = {
       const res = await fetch(`${API_URL}/api/v1/usuarios`, { headers });
       if (!res.ok) throw new Error('Error al obtener usuarios');
       const json = await res.json();
-      return json.data as Usuario[];
+      return (json.data ?? []) as Usuario[];
     },
     getMe: async (): Promise<Usuario> => {
       const headers = await getAuthHeaders();
@@ -552,6 +593,42 @@ export const api = {
       }
       const json = await res.json();
       return json.data as Usuario;
+    },
+    assignParcelas: async (usuarioId: string, parcelaIds: string[]): Promise<void> => {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_URL}/api/v1/usuarios/${usuarioId}/parcelas`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({ parcela_ids: parcelaIds }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message ?? 'Error al asignar parcelas');
+      }
     }
-  }
+  },
+
+  configuracion: {
+    get: async (): Promise<Configuracion> => {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_URL}/api/v1/configuracion`, { headers });
+      if (!res.ok) throw new Error('Error al obtener la configuración');
+      const json = await res.json();
+      return json.data as Configuracion;
+    },
+    update: async (input: ConfiguracionInput): Promise<Configuracion> => {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_URL}/api/v1/configuracion`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(input),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message ?? 'Error al actualizar la configuración');
+      }
+      const json = await res.json();
+      return json.data as Configuracion;
+    },
+  },
 };

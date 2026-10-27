@@ -26,15 +26,37 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView, onLogout
 
   const [parcelas, setParcelas] = useState<Parcela[]>([]);
   const [selectedParcelaId, setSelectedParcelaId] = useState<string>(localStorage.getItem('selected_parcela') || '');
+  const [companyName, setCompanyName] = useState<string>(localStorage.getItem('company_name') || 'Loterra');
+
+  useEffect(() => {
+    const handleCompanyUpdate = (e: any) => {
+      if (e.detail) setCompanyName(e.detail);
+    };
+    window.addEventListener('company_updated', handleCompanyUpdate);
+    api.configuracion.get().then(cfg => {
+      if (cfg?.razon_social) {
+        setCompanyName(cfg.razon_social);
+        localStorage.setItem('company_name', cfg.razon_social);
+      }
+    }).catch(() => {});
+    return () => window.removeEventListener('company_updated', handleCompanyUpdate);
+  }, []);
 
   useEffect(() => {
     const fetchParcelas = async () => {
       try {
         const data = await api.parcelas.getAll();
         setParcelas(data);
-        if (data.length > 0 && !localStorage.getItem('selected_parcela')) {
+        const storedId = localStorage.getItem('selected_parcela');
+        const isValid = data.some(p => p.id === storedId);
+        if (data.length > 0 && (!storedId || !isValid)) {
           localStorage.setItem('selected_parcela', data[0].id);
           setSelectedParcelaId(data[0].id);
+        } else if (storedId && isValid) {
+          setSelectedParcelaId(storedId);
+        } else if (data.length === 0) {
+          localStorage.removeItem('selected_parcela');
+          setSelectedParcelaId('');
         }
       } catch (err) {
         console.error('Error fetching parcelas:', err);
@@ -56,10 +78,10 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView, onLogout
       <div className="p-6 pb-2">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-orange-500/20">
-            L
+            {companyName ? companyName.charAt(0).toUpperCase() : 'L'}
           </div>
           <div>
-            <h2 className="text-xl font-bold text-neutral-900 tracking-tight">Loterra</h2>
+            <h2 className="text-xl font-bold text-neutral-900 tracking-tight">{companyName}</h2>
             <span className="text-[10px] font-bold text-neutral-400 tracking-widest uppercase">{userRole === 'admin' ? 'Admin Ventas' : 'Asesor'}</span>
           </div>
         </div>
@@ -75,7 +97,11 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView, onLogout
             onChange={handleParcelaChange}
             className="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-sm font-medium text-neutral-700 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all cursor-pointer"
           >
-            <option value="" disabled>Selecciona una parcela...</option>
+            {parcelas.length === 0 ? (
+              <option value="" disabled>Sin parcelas asignadas</option>
+            ) : (
+              <option value="" disabled>Selecciona una parcela...</option>
+            )}
             {parcelas.map(p => (
               <option key={p.id} value={p.id}>{p.nombre}</option>
             ))}
